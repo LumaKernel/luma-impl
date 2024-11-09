@@ -1,5 +1,5 @@
 [package]
-name = "semi-group-quick"
+name = "group-quick"
 version = "0.1.0"
 edition = "2021"
 

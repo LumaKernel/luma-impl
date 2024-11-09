@@ -3,5 +3,12 @@
 version = 3
 
 [[package]]
-name = "luma-lib-self"
+name = "accum"
+version = "0.1.0"
+dependencies = [
+ "group-quick",
+]
+
+[[package]]
+name = "group-quick"
 version = "0.1.0"

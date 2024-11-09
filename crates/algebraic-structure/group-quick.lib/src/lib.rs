@@ -1,16 +1,16 @@
 use std::ops;
 
 #[derive(Debug, PartialEq, Eq)]
-pub struct QuickSemiGroup<T, Add, Negate>
+pub struct QuickGroup<T, Add, Negate>
 where
     Add: Fn(&T, &T) -> T + 'static,
     Negate: Fn(&T) -> T + 'static,
 {
-    v: T,
-    add: &'static Add,
-    negate: &'static Negate,
+    pub v: T,
+    pub add: &'static Add,
+    pub negate: &'static Negate,
 }
-impl<T, Add, Negate> Clone for QuickSemiGroup<T, Add, Negate>
+impl<T, Add, Negate> Clone for QuickGroup<T, Add, Negate>
 where
     T: Clone,
     Add: Fn(&T, &T) -> T + 'static,
@@ -24,7 +24,7 @@ where
         }
     }
 }
-impl<T, Add, Negate> QuickSemiGroup<T, Add, Negate>
+impl<T, Add, Negate> QuickGroup<T, Add, Negate>
 where
     Add: Fn(&T, &T) -> T + 'static,
     Negate: Fn(&T) -> T + 'static,
@@ -33,38 +33,38 @@ where
         Self { v, add, negate }
     }
 }
-impl<T, Add, Negate> ops::Add<&QuickSemiGroup<T, Add, Negate>> for &QuickSemiGroup<T, Add, Negate>
+impl<T, Add, Negate> ops::Add<&QuickGroup<T, Add, Negate>> for &QuickGroup<T, Add, Negate>
 where
     Add: Fn(&T, &T) -> T + 'static,
     Negate: Fn(&T) -> T + 'static,
 {
-    type Output = QuickSemiGroup<T, Add, Negate>;
-    fn add(self, rhs: &QuickSemiGroup<T, Add, Negate>) -> Self::Output {
-        QuickSemiGroup::new((self.add)(&self.v, &rhs.v), self.add, self.negate)
+    type Output = QuickGroup<T, Add, Negate>;
+    fn add(self, rhs: &QuickGroup<T, Add, Negate>) -> Self::Output {
+        QuickGroup::new((self.add)(&self.v, &rhs.v), self.add, self.negate)
     }
 }
-impl<T, Add, Negate> ops::Sub<&QuickSemiGroup<T, Add, Negate>> for &QuickSemiGroup<T, Add, Negate>
+impl<T, Add, Negate> ops::Sub<&QuickGroup<T, Add, Negate>> for &QuickGroup<T, Add, Negate>
 where
     Add: Fn(&T, &T) -> T + 'static,
     Negate: Fn(&T) -> T + 'static,
 {
-    type Output = QuickSemiGroup<T, Add, Negate>;
-    fn sub(self, rhs: &QuickSemiGroup<T, Add, Negate>) -> Self::Output {
-        QuickSemiGroup::new(
+    type Output = QuickGroup<T, Add, Negate>;
+    fn sub(self, rhs: &QuickGroup<T, Add, Negate>) -> Self::Output {
+        QuickGroup::new(
             (self.add)(&self.v, &(self.negate)(&rhs.v)),
             self.add,
             self.negate,
         )
     }
 }
-impl<T, Add, Negate> ops::Neg for &QuickSemiGroup<T, Add, Negate>
+impl<T, Add, Negate> ops::Neg for &QuickGroup<T, Add, Negate>
 where
     Add: Fn(&T, &T) -> T + 'static,
     Negate: Fn(&T) -> T + 'static,
 {
-    type Output = QuickSemiGroup<T, Add, Negate>;
+    type Output = QuickGroup<T, Add, Negate>;
     fn neg(self) -> Self::Output {
-        QuickSemiGroup::new((self.negate)(&self.v), self.add, self.negate)
+        QuickGroup::new((self.negate)(&self.v), self.add, self.negate)
     }
 }
 
@@ -133,7 +133,7 @@ pub fn accum_by<T, Add, Negate>(
     v: Vec<T>,
     add: Add,
     negate: Negate,
-) -> Accumulated<QuickSemiGroup<T, Add, Negate>, T, impl Fn(&QuickSemiGroup<T, Add, Negate>) -> T>
+) -> Accumulated<QuickGroup<T, Add, Negate>, T, impl Fn(&QuickGroup<T, Add, Negate>) -> T>
 where
     T: Clone,
     Add: Fn(&T, &T) -> T,
@@ -143,10 +143,25 @@ where
     let negate = &*Box::leak(Box::new(negate));
     let v = v
         .into_iter()
-        .map(|x| QuickSemiGroup::new(x, add, negate))
+        .map(|x| QuickGroup::new(x, add, negate))
         .collect();
-    let to_return = |x: &QuickSemiGroup<T, Add, Negate>| x.v.clone();
+    let to_return = |x: &QuickGroup<T, Add, Negate>| x.v.clone();
     accum_internal(v, to_return)
+}
+
+pub trait UsizeSequentialRange {
+    fn range_includsive(self) -> ops::RangeInclusive<usize>;
+}
+impl UsizeSequentialRange for ops::Range<usize> {
+    fn range_includsive(self) -> ops::RangeInclusive<usize> {
+        self.start..=self.end - 1
+    }
+}
+
+impl UsizeSequentialRange for ops::RangeInclusive<usize> {
+    fn range_includsive(self) -> ops::RangeInclusive<usize> {
+        self
+    }
 }
 
 impl<T, U, ToReturn> Accumulated<T, U, ToReturn>
@@ -155,7 +170,8 @@ where
     ToReturn: Fn(&T) -> U + 'static,
     for<'a> &'a T: ops::Add<&'a T, Output = T> + ops::Neg<Output = T>,
 {
-    pub fn sum(&self, range: ops::RangeInclusive<usize>) -> U {
+    pub fn sum(&self, range: impl UsizeSequentialRange) -> U {
+        let range = range.range_includsive();
         (self.to_return)(&if *range.start() == 0 {
             self.accum[*range.end()].clone()
         } else {
@@ -178,6 +194,3 @@ where
 //        })
 //    }
 //}
-
-#[cfg(test)]
-mod test;

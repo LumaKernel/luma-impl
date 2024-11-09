@@ -11,6 +11,9 @@ fn test_accum() {
     assert_eq!(a.sum(4..=4), 3);
     assert_eq!(a.sum(3..=4), -2);
     assert_eq!(a.sum(0..=4), 29);
+    assert_eq!(a.sum(0..3), 31);
+    assert_eq!(a.sum(0..5), 29);
+    assert_eq!(a.sum(1..1), 0);
 }
 
 #[test]
