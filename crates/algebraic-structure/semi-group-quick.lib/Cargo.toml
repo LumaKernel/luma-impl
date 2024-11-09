@@ -1,5 +1,5 @@
 [package]
-name = "luma-lib-self"
+name = "semi-group-quick"
 version = "0.1.0"
 edition = "2021"
 
