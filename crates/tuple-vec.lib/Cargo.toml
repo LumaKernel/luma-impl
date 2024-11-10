@@ -1,10 +1,7 @@
 [package]
-name = "accum"
+name = "tuple-vec"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 algebraic-traits = { path = "../algebraic-traits.lib" }
-
-[dev-dependencies]
-tuple-vec = { path = "../tuple-vec.lib" }

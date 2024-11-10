@@ -6,9 +6,17 @@ version = 3
 name = "accum"
 version = "0.1.0"
 dependencies = [
- "group-quick",
+ "algebraic-traits",
+ "tuple-vec",
 ]
 
 [[package]]
-name = "group-quick"
+name = "algebraic-traits"
 version = "0.1.0"
+
+[[package]]
+name = "tuple-vec"
+version = "0.1.0"
+dependencies = [
+ "algebraic-traits",
+]
