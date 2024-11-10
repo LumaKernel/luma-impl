@@ -164,7 +164,7 @@ where
     Id: Fn() -> T + 'static,
     ToReturn: Fn(&T) -> U + 'static,
 {
-    pub fn sum(&self, range: impl UsizeSequentialRange) -> U {
+    pub fn fold(&self, range: impl UsizeSequentialRange) -> U {
         let mut range = range.into_range();
         if range.end > self.accum.len() {
             range.end = self.accum.len();
