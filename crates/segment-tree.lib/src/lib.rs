@@ -1,6 +1,6 @@
 #![allow(clippy::type_complexity)]
 use access_range::IntoAccessRange;
-use ceil_log2::ceil_log2_usize_unchecked;
+use ceil_log2::ceil_log2_usize;
 use monoid::{Monoid, QuickMonoid};
 use transparent_trait::Transparent;
 
@@ -66,8 +66,7 @@ where
             };
         }
 
-        // SAFETY: len is not 0.
-        let height = unsafe { ceil_log2_usize_unchecked(len) };
+        let height = ceil_log2_usize(len);
         let len2 = 1 << height;
 
         tree.reserve_exact(len2 * 2);
