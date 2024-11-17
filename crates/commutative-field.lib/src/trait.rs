@@ -1,4 +1,4 @@
-use crate::commutative_ring::CommutativeRing;
+use commutative_ring::CommutativeRing;
 
 /// CommutativeField:
 ///   Definitions:

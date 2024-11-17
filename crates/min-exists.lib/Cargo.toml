@@ -1,7 +1,6 @@
 [package]
-name = "tuple-vec"
+name = "min-exists"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-group = { path = "../group.lib" }

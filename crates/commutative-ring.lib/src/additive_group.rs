@@ -1,12 +1,12 @@
 use super::CommutativeRing;
-use crate::group::{Group, QuickGroup, QuickGroupStatic};
+use group::{Group, QuickGroup, QuickGroupStatic};
 use std::ops;
 
 pub fn quick_group_by_add<T: CommutativeRing>() -> QuickGroupStatic<T> {
     QuickGroup::new(
-        &(<T as CommutativeRing>::add as fn(&T, &T) -> T),
-        &(<T as CommutativeRing>::neg as fn(&T) -> T),
-        &(<T as CommutativeRing>::zero as fn() -> T),
+        <T as CommutativeRing>::add as fn(&T, &T) -> T,
+        <T as CommutativeRing>::neg as fn(&T) -> T,
+        <T as CommutativeRing>::zero as fn() -> T,
     )
 }
 

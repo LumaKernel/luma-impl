@@ -17,8 +17,8 @@ pub trait Group {
 
 pub fn group_to_quick<T: Group>() -> QuickGroupStatic<T> {
     QuickGroup::new(
-        &(<T as Group>::op as fn(&T, &T) -> T),
-        &(<T as Group>::inv as fn(&T) -> T),
-        &(<T as Group>::id as fn() -> T),
+        <T as Group>::op as fn(&T, &T) -> T,
+        <T as Group>::inv as fn(&T) -> T,
+        <T as Group>::id as fn() -> T,
     )
 }

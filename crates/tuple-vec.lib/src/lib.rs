@@ -1,4 +1,4 @@
-use algebraic_traits::group::Group;
+use group::Group;
 use std::ops::{Add, Neg};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]

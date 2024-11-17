@@ -1,6 +1,6 @@
 #![allow(clippy::reversed_empty_ranges)]
 use crate::{accum, accum_by, accum_by_add};
-use algebraic_traits::commutative_ring::CommutativeRing;
+use commutative_ring::CommutativeRing;
 use tuple_vec::TupleVec2;
 
 #[test]
@@ -8,14 +8,29 @@ fn test_accum() {
     let v = vec![1, 10, 20, -5, 3];
     let a = accum_by_add(v);
     assert_eq!(a.fold(0..=0), 1);
+    assert_eq!(a.fold(0), 1);
+
     assert_eq!(a.fold(0..=1), 11);
+
     assert_eq!(a.fold(1..=1), 10);
+    assert_eq!(a.fold(1), 10);
+
     assert_eq!(a.fold(4..=4), 3);
+    assert_eq!(a.fold(4), 3);
+
     assert_eq!(a.fold(3..=4), -2);
+    assert_eq!(a.fold(3..), -2);
+
     assert_eq!(a.fold(0..=4), 29);
+    assert_eq!(a.fold(..), 29);
+    assert_eq!(a.fold(..=4), 29);
+    assert_eq!(a.fold(0..), 29);
+
     assert_eq!(a.fold(0..0), 0);
     assert_eq!(a.fold(0..3), 31);
+    assert_eq!(a.fold(..3), 31);
     assert_eq!(a.fold(0..5), 29);
+    assert_eq!(a.fold(..5), 29);
     assert_eq!(a.fold(0..0), 0);
     assert_eq!(a.fold(1..0), 0);
     assert_eq!(a.fold(1..1), 0);
@@ -49,8 +64,8 @@ fn test_accum_with_tuple_vec() {
             .map(TupleVec2::from)
             .collect(),
     )
-    .map(|e| e.into_tuple())
-    .map(|(a, b)| (a.into_inner(), b.into_inner()));
+    .map_return(|e| e.into_tuple())
+    .map_return(|(a, b)| (a.into_inner(), b.into_inner()));
     assert_eq!(a.fold(0..=0), (1, 4));
     assert_eq!(a.fold(0..=1), (-2, 8));
     assert_eq!(a.fold(1..=1), (-3, 4));

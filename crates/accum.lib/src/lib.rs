@@ -1,19 +1,17 @@
-use algebraic_traits::{
-    commutative_ring::{quick_group_by_add, CommutativeRing},
-    group::{group_to_quick, Group, QuickGroup},
-};
-use std::ops;
+use access_range::IntoAccessRange;
+use commutative_ring::{quick_group_by_add, CommutativeRing};
+use group::{group_to_quick, Group, QuickGroup};
 
 pub struct Accumulated<T, U, Op, Inv, Id, ToReturn>
 where
-    Op: Fn(&T, &T) -> T + 'static,
-    Inv: Fn(&T) -> T + 'static,
-    Id: Fn() -> T + 'static,
-    ToReturn: Fn(&T) -> U + 'static,
+    Op: Fn(&T, &T) -> T,
+    Inv: Fn(&T) -> T,
+    Id: Fn() -> T,
+    ToReturn: Fn(&T) -> U,
 {
     accum: Vec<T>,
     group: QuickGroup<T, Op, Inv, Id>,
-    to_return: &'static ToReturn,
+    to_return: ToReturn,
 }
 
 impl<T, U, Op, Inv, Id, ToReturn> Accumulated<T, U, Op, Inv, Id, ToReturn>
@@ -23,26 +21,20 @@ where
     Id: Fn() -> T + 'static,
     ToReturn: Fn(&T) -> U + 'static,
 {
-    pub fn map<U2>(
+    #[inline]
+    pub fn map_return<U2>(
         self,
         map_fn: impl Fn(U) -> U2 + 'static,
     ) -> Accumulated<T, U2, Op, Inv, Id, impl Fn(&T) -> U2 + 'static> {
-        fn this_is_general<T, U, F>(a: F) -> F
-        where
-            F: Fn(&T) -> U,
-        {
-            a
-        }
-        let to_return = this_is_general(move |x| map_fn((self.to_return)(x)));
-        let to_return = &*Box::leak(Box::new(to_return));
         Accumulated {
             accum: self.accum,
             group: self.group,
-            to_return,
+            to_return: move |x| map_fn((self.to_return)(x)),
         }
     }
 }
 
+#[inline]
 pub fn accum<T>(
     v: Vec<T>,
 ) -> Accumulated<
@@ -71,10 +63,11 @@ where
     Accumulated {
         accum,
         group,
-        to_return: &|x| x.clone(),
+        to_return: |x| x.clone(),
     }
 }
 
+#[inline]
 pub fn accum_by_add<T>(
     v: Vec<T>,
 ) -> Accumulated<
@@ -103,7 +96,7 @@ where
     Accumulated {
         accum,
         group,
-        to_return: &|x| x.clone(),
+        to_return: |x| x.clone(),
     }
 }
 
@@ -119,9 +112,6 @@ where
     Inv: Fn(&T) -> T + 'static,
     Id: Fn() -> T + 'static,
 {
-    let op = &*Box::leak(Box::new(op));
-    let inv = &*Box::leak(Box::new(inv));
-    let id = &*Box::leak(Box::new(id));
     let group = QuickGroup::new(op, inv, id);
     let mut accum = Vec::new();
     for e in v.into_iter() {
@@ -137,22 +127,7 @@ where
     Accumulated {
         accum,
         group,
-        to_return: &|x| x.clone(),
-    }
-}
-
-pub trait UsizeSequentialRange {
-    fn into_range(self) -> ops::Range<usize>;
-}
-impl UsizeSequentialRange for ops::Range<usize> {
-    fn into_range(self) -> ops::Range<usize> {
-        self
-    }
-}
-
-impl UsizeSequentialRange for ops::RangeInclusive<usize> {
-    fn into_range(self) -> ops::Range<usize> {
-        *self.start()..*self.end() + 1
+        to_return: |x| x.clone(),
     }
 }
 
@@ -164,11 +139,8 @@ where
     Id: Fn() -> T + 'static,
     ToReturn: Fn(&T) -> U + 'static,
 {
-    pub fn fold(&self, range: impl UsizeSequentialRange) -> U {
-        let mut range = range.into_range();
-        if range.end > self.accum.len() {
-            range.end = self.accum.len();
-        }
+    pub fn fold(&self, range: impl IntoAccessRange<usize>) -> U {
+        let range = range.into_access_range().into_range(self.accum.len());
         (self.to_return)(&{
             if range.start >= range.end {
                 self.group.id()
@@ -176,8 +148,8 @@ where
                 self.accum[range.end - 1].clone()
             } else {
                 self.group.op(
-                    &self.accum[range.end - 1],
                     &self.group.inv(&self.accum[range.start - 1]),
+                    &self.accum[range.end - 1],
                 )
             }
         })

@@ -1,0 +1,8 @@
+[package]
+name = "commutative-field"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+commutative-ring = { path = "../commutative-ring.lib" }
+

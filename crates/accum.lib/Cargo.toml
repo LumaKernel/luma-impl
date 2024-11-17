@@ -4,7 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-algebraic-traits = { path = "../algebraic-traits.lib" }
+group = { path = "../group.lib" }
+commutative-ring = { path = "../commutative-ring.lib" }
+access-range = { path = "../access-range.lib" }
 
 [dev-dependencies]
 tuple-vec = { path = "../tuple-vec.lib" }
