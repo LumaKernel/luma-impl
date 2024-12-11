@@ -90,23 +90,23 @@ fn test_find_index_to_end_max_len1() {
     let v: Vec<i32> = vec![0];
     let seg = segment_tree_new_transparent!(MaxMonoid<_>, v);
     assert_eq!(seg.find_index_to_end(0, |v, _| v < 0), 0);
-    assert_eq!(seg.find_index_to_end(0, |v, _| v < 100), 0);
+    assert_eq!(seg.find_index_to_end(0, |v, _| v < 100), 1);
 }
 
 #[test]
-fn test_find_index_to_end_min_index() {
+fn test_find_index_to_start_min_index() {
     for n in (1..40).chain(vec![1000]) {
         let v: Vec<usize> = (0..n).collect();
         let seg = segment_tree_new_transparent!(MinMonoid<_>, v);
         for t in [0, (n + 1) / 2, (n + 1) / 2 + 1, n, n + 1] {
-            seg.find_index_to_end(n, |v, l| {
+            seg.find_index_to_start(n, |v, l| {
                 assert_eq!(l, v, "n={n}");
-                assert!(l > 0);
+                assert!(l < n);
                 v >= t
             });
-            seg.find_index_to_end(n - 1, |v, l| {
+            seg.find_index_to_start(n - 1, |v, l| {
                 assert_eq!(l, v, "n={n}");
-                assert!(l > 0);
+                assert!(l < n - 1);
                 v >= t
             });
         }
@@ -116,18 +116,19 @@ fn test_find_index_to_end_min_index() {
 #[test]
 fn test_find_index_to_end_max_index() {
     for n in 1..40_usize {
-        let v: Vec<i32> = (0..n as i32).collect();
+        let ns = n as i32;
+        let v: Vec<i32> = (0..ns).collect();
         let seg = segment_tree_new_transparent!(MaxMonoid<_>, v);
-        for t in [0, (n as i32 + 1) / 2, 100] {
+        for t in [0, (ns + 1) / 2, (ns + 1) / 2 + 1, ns, ns + 1] {
             seg.find_index_to_end(0, |v, r| {
                 assert_eq!(r as i32, v + 1, "n={n}");
-                assert!(r < n);
+                assert!(r <= n);
                 v < t
             });
             if n >= 2 {
                 seg.find_index_to_end(1, |v, r| {
                     assert_eq!(r as i32, v + 1, "n={n}");
-                    assert!(r < n);
+                    assert!(1 <= r && r <= n, "r={r}, n={n}");
                     v < t
                 });
             }
@@ -167,7 +168,7 @@ fn test_max_full() {
                 let t = rng.gen_range(0..width + 1);
                 let r_got = seg.find_index_to_end(l, |folded, r| {
                     assert_eq!(folded, seg.fold(l..r));
-                    assert!(r < n);
+                    assert!(l < r && r <= n, "l={l}, r={r}, n={n}");
                     folded < t
                 });
                 let r_want = (|| {
@@ -182,9 +183,9 @@ fn test_max_full() {
             }
             for r in 0..=n {
                 let t = rng.gen_range(0..width + 1);
-                let l_got = seg.find_index_to_end(r, |folded, l| {
+                let l_got = seg.find_index_to_start(r, |folded, l| {
                     assert_eq!(folded, seg.fold(l..r));
-                    assert!(l > 0);
+                    assert!(l < r);
                     folded < t
                 });
                 let l_want = (|| {
@@ -217,9 +218,9 @@ fn test_take_right() {
 
     // 最初に0でない場所、を効率的に探せる
     assert_eq!(seg.get(6), 4);
-    assert_eq!(seg.find_index_to_start(7, |v, _| v == 0), 6);
-    assert_eq!(seg.find_index_to_start(8, |v, _| v == 0), 6);
-    assert_eq!(seg.find_index_to_start(9, |v, _| v == 0), 6);
+    assert_eq!(seg.find_index_to_start(7, |v, _| v == 0), 7);
+    assert_eq!(seg.find_index_to_start(8, |v, _| v == 0), 7);
+    assert_eq!(seg.find_index_to_start(9, |v, _| v == 0), 7);
     assert_eq!(seg.get(14), 5);
     assert_eq!(seg.find_index_to_end(8, |v, _| v == 0), 14);
     assert_eq!(seg.find_index_to_end(9, |v, _| v == 0), 14);

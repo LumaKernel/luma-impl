@@ -292,7 +292,7 @@ where
     /// $O(log N)$
     #[inline]
     pub fn set(&mut self, index: usize, value: impl Into<T>) {
-        self.update(index, |_| value.into());
+        self.update(index, |_| value);
     }
 
     /// # 関数による更新
@@ -301,16 +301,17 @@ where
     ///
     /// $O(log N)$
     #[inline]
-    pub fn update<F>(&mut self, index: usize, update_fn: F)
+    pub fn update<F, V>(&mut self, index: usize, update_fn: F)
     where
-        F: FnOnce(&T) -> T,
+        F: FnOnce(&T) -> V,
+        V: Into<T>,
     {
         if index >= self.len {
             panic!("index out of range: {}", index);
         }
         let mut index = self.leaf_of(index);
         *unsafe { self.tree.get_unchecked_mut(index) } =
-            update_fn(unsafe { self.tree.get_unchecked(index) });
+            update_fn(unsafe { self.tree.get_unchecked(index) }).into();
         while index > self.root_node() {
             index = self.parent_tree_index(index);
             let (left, right) = self.children_indices(index);
@@ -342,16 +343,20 @@ where
     }
 
     /// # 始端に向けて探す探索
-    /// 単調な `cond_fn` と `r` について、 `cond_fn(fold(l..r), r)` を満たす
+    /// 単調な `cond_fn` と `r` について、 `cond_fn(fold(l..r), l)` を満たす
     /// `r` 未満で最小の値 `l` を返す。
-    /// そのような値がなければ `r` を返す。
-    /// `cond_fn(fold(r..r), r) == true` であれば整合するが、これが呼ばれることはない。
+    /// そのような値がなければ `r` を返す。 `cond_fn(fold(r..r), r) == true` であれば整合するが、これが呼ばれることはない。
     ///
-    /// # Panic-free Preconditions
+    /// 以下のようにも言い換えられる。
+    /// すべての `i in l..r` は次を満たす: `cond_fn(fold(l..=i), i+1)`
+    /// このような区間 l..r であって、固定されていないほうを最大化する。
+    /// これは `find_index_to_start(r, cond_fn)` と `find_index_to_end(l, cond_fn)` で同じ表現になるという点で分かりやすい。
+    ///
+    /// # Panic-free preconditions
     /// - `l <= self.len()`
-    /// - `cond_fn(fold(l..x), x)` は `x` について単調に `true` から `false` に変化する
+    /// - `cond_fn(fold(x..r), x)` は `x` の減少について単調に `true` から `false` に変化する
     ///   - 例:
-    ///   - `cond_fn(fold(9..9), 9) == true`
+    ///   - `cond_fn(fold(9..9), 9) == true` (実際の値に関わらずこのように扱われ、呼ばれない)
     ///   - `cond_fn(fold(8..9), 8) == true`
     ///   - `cond_fn(fold(7..9), 7) == true`
     ///   - `cond_fn(fold(6..9), 6) == true`
@@ -412,7 +417,7 @@ where
                                 .monoid
                                 .op(unsafe { self.tree.get_unchecked(cur) }, &done),
                         ),
-                        done_l + cur_len,
+                        done_l - cur_len,
                     )
                 };
             }
@@ -428,13 +433,13 @@ where
             }
 
             // ノード `cur` が右側の子である間、 `cur` を親に置き換える
-            while cur % 2 == 0 {
+            while cur != 1 && cur % 2 == 1 {
                 cur = self.parent_tree_index(cur);
                 cur_len *= 2;
             }
             if !cond!() {
                 // 現在の `cur` の左端は対象ではないから、
-                // `cur` ノードの葉に対応するインデックスが対象であることがわかる
+                // `cur` ノードの葉に対応するどれかが対象であることがわかる
 
                 while !self.is_leaf(cur) {
                     cur = self.children_indices(cur).1;
@@ -443,7 +448,7 @@ where
                         go_left!();
                     }
                 }
-                return self.index_of_leaf(cur + 1);
+                return self.index_of_leaf(cur) + 1;
             }
 
             // `cur` が2冪であれば、 `cur` がその高さにおける左端まで行ったということなので終了
@@ -452,21 +457,26 @@ where
             }
 
             go_left!();
+            cur = self.parent_tree_index(cur);
+            cur_len *= 2;
         }
     }
 
     /// # 終端に向けて探す探索
-    /// 単調な `cond_fn` と `l` について、 `cond_fn(fold(l..r), r)` を満たさない
-    /// `l` 以上 `len()` 未満で最小の値 `r` を返す。
-    /// `len()` 未満でそのような値がなければ、 `len()` を返す。
-    /// `cond_fn(fold(l..len()), len()) == false`
-    /// であれば整合するが、実際にこれが呼ばれることはない。
+    /// 単調な `cond_fn` と `l` について、 `cond_fn(fold(l..r), r)` を満たす
+    /// `l+1` 以上 `len()` 以下で最大の値 `r` を返す。
+    /// そのような値がなければ `l` を返す。`cond_fn(fold(l..l), l) == true` であれば整合するが、これが呼ばれることはない。
     ///
-    /// # Panic-free Preconditions
+    /// 以下のようにも言い換えられる。
+    /// すべての `i in l..r` は次を満たす: `cond_fn(fold(l..=i), i+1)`
+    /// このような区間 l..r であって、固定されていないほうを最大化する。
+    /// これは `find_index_to_start(r, cond_fn)` と `find_index_to_end(l, cond_fn)` で同じ表現になるという点で分かりやすい。
+    ///
+    /// # Panic-free preconditions
     /// - `l < self.len()`
     /// - `cond_fn(fold(l..x), x)` は `x` について単調に `true` から `false` に変化する
     ///   - 例:
-    ///   - `cond_fn(fold(3..3), 3) == true`
+    ///   - `cond_fn(fold(3..3), 3) == true` (実際の値に関わらずこのように扱われ、呼ばれない)
     ///   - `cond_fn(fold(3..4), 4) == true`
     ///   - `cond_fn(fold(3..5), 5) == true`
     ///   - `cond_fn(fold(3..6), 6) == false`
@@ -512,13 +522,14 @@ where
             // - `done == fold(l..done_r)`
             // - `done_r` 未満に答えはない
 
+            dbg!(done_r, cur, cur_len);
             if cfg!(test) {
                 debug_assert_eq!(self.range_len_of_node(cur), cur_len);
             }
 
             macro_rules! cond {
                 () => {
-                    (done_r + cur_len) < self.len
+                    (done_r + cur_len) <= self.len
                         && cond_fn(
                             (self.to_return)(
                                 &self
@@ -547,7 +558,7 @@ where
             }
             if !cond!() {
                 // 現在の `cur` の右端は対象ではないから、
-                // `cur` 内のノードの葉に対応するインデックスが対象であることがわかる
+                // `cur` 内のノードの葉に対応するどれかが対象であることがわかる
 
                 while !self.is_leaf(cur) {
                     cur = self.children_indices(cur).0;
@@ -565,6 +576,9 @@ where
             if cur & 0_usize.wrapping_sub(cur) == cur {
                 return self.len;
             }
+
+            cur = self.parent_tree_index(cur);
+            cur_len *= 2;
         }
     }
 
