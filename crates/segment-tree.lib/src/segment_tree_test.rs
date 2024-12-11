@@ -71,6 +71,13 @@ fn test_add_full() {
 }
 
 #[test]
+fn test_find_index_to_start_max_len0() {
+    let v: Vec<i32> = vec![];
+    let seg = segment_tree_new_transparent!(MaxMonoid<_>, v);
+    assert_eq!(seg.find_index_to_start(0, |_, _| unreachable!()), 0);
+}
+
+#[test]
 fn test_find_index_to_start_max_len1() {
     let v: Vec<i32> = vec![0];
     let seg = segment_tree_new_transparent!(MaxMonoid<_>, v);
@@ -209,8 +216,14 @@ fn test_take_right() {
     assert_eq!(seg.fold(..), 4);
 
     // 最初に0でない場所、を効率的に探せる
+    assert_eq!(seg.get(6), 4);
+    assert_eq!(seg.find_index_to_start(7, |v, _| v == 0), 6);
+    assert_eq!(seg.find_index_to_start(8, |v, _| v == 0), 6);
+    assert_eq!(seg.find_index_to_start(9, |v, _| v == 0), 6);
     assert_eq!(seg.get(14), 5);
+    assert_eq!(seg.find_index_to_end(8, |v, _| v == 0), 14);
     assert_eq!(seg.find_index_to_end(9, |v, _| v == 0), 14);
+    assert_eq!(seg.find_index_to_end(10, |v, _| v == 0), 14);
 
     seg.set(6, 0);
     assert_eq!(seg.fold(..7), 3);
