@@ -13,8 +13,11 @@ where
     monoid: QuickMonoid<T, Op, Id>,
     to_return: ToReturn,
 
+    /// tree.len == 2 * len2
     tree: Vec<T>,
+    /// 論理的な長さ
     len: usize,
+    /// lenをそれ以上の最小の2羃に丸めたもの
     len2: usize,
 }
 
@@ -78,12 +81,13 @@ where
             tree.push(e);
         }
         for i in 0..len2 - 1 {
-            let right = &tree[i * 2];
-            let left = &tree[i * 2 + 1];
+            let right = &unsafe { tree.get_unchecked(i * 2) };
+            let left = &unsafe { tree.get_unchecked(i * 2 + 1) };
             tree.push(monoid.op(left, right));
         }
         tree.push(monoid.id());
         tree.reverse();
+        debug_assert_eq!(tree.len(), len2 * 2);
         SegmentTree {
             monoid,
             to_return,
@@ -94,7 +98,16 @@ where
     }
 }
 
-/// # Usage
+/// # セグメントツリーの構築 (モノイドの直接指定)
+///
+/// 初期リスト、演算子、単位元の順で指定する。
+///
+/// ## 計算量
+///
+/// $O(N)$
+///
+/// ## 例
+///
 /// ```
 /// use segment_tree::segment_tree_new_by;
 /// let mut seg = segment_tree_new_by(vec![1, 4, 2, 3, 8, 3, 4], |a, b| a.max(b).clone(), || 0);
@@ -173,7 +186,7 @@ where
 
     #[inline(always)]
     pub fn len(&self) -> usize {
-        self.tree.len()
+        self.len
     }
 
     #[inline(always)]
@@ -182,18 +195,33 @@ where
     }
 
     #[inline(always)]
-    fn parent_index(&self, index: usize) -> usize {
-        index / 2
+    fn parent_tree_index(&self, tree_index: usize) -> usize {
+        debug_assert!(1 <= tree_index && tree_index <= self.tree.len());
+        tree_index / 2
     }
 
     #[inline(always)]
-    fn children_indices(&self, index: usize) -> (usize, usize) {
-        (index * 2, index * 2 + 1)
+    fn children_indices(&self, tree_index: usize) -> (usize, usize) {
+        debug_assert!(1 <= tree_index && tree_index < self.tree.len());
+        (tree_index * 2, tree_index * 2 + 1)
     }
 
     #[inline(always)]
     fn leaf_of(&self, index: usize) -> usize {
+        debug_assert!(index <= self.len);
         index + self.len2
+    }
+
+    #[inline(always)]
+    fn index_of_leaf(&self, tree_index: usize) -> usize {
+        debug_assert!(self.len2 <= tree_index && tree_index <= self.tree.len());
+        tree_index - self.len2
+    }
+
+    #[inline(always)]
+    fn is_leaf(&self, tree_index: usize) -> bool {
+        debug_assert!(1 <= tree_index && tree_index < self.tree.len());
+        tree_index >= self.len2
     }
 
     #[inline(always)]
@@ -201,7 +229,14 @@ where
         1
     }
 
-    /// O(log N)
+    /// # fold
+    ///
+    /// 区間 `l..r` であれば、 `a + b := monoid.op(a, b)` として
+    /// `v[l] + v[l+1] + .. + v[r-1]` を返す
+    ///
+    /// ## 計算量
+    ///
+    /// $O(log N)$
     #[inline]
     pub fn fold(&self, range: impl IntoAccessRange<usize>) -> U {
         if self.is_empty() {
@@ -221,33 +256,50 @@ where
 
         while l < r {
             if l % 2 == 1 {
-                left_folded = self.monoid.op(&left_folded, &self.tree[l]);
+                left_folded = self
+                    .monoid
+                    .op(&left_folded, unsafe { self.tree.get_unchecked(l) });
                 l += 1;
             }
             if r % 2 == 1 {
                 r -= 1;
-                right_folded = self.monoid.op(&self.tree[r], &right_folded);
+                right_folded = self
+                    .monoid
+                    .op(unsafe { self.tree.get_unchecked(r) }, &right_folded);
             }
-            l = self.parent_index(l);
-            r = self.parent_index(r);
+            l = self.parent_tree_index(l);
+            r = self.parent_tree_index(r);
         }
         debug_assert!(l == r || l == r + 1, "l: {}, r: {}", l, r);
         (self.to_return)(&self.monoid.op(&left_folded, &right_folded))
     }
 
-    /// O(log N)
+    /// # 取得
+    ///
+    /// ## 計算量
+    ///
+    /// $O(1)$
     #[inline(always)]
     pub fn get(&self, index: usize) -> U {
-        self.fold(index)
+        assert!(index < self.len, "index out of range: {}", index);
+        (self.to_return)(unsafe { self.tree.get_unchecked(self.leaf_of(index)) })
     }
 
-    /// O(log N)
+    /// # セット
+    ///
+    /// ## 計算量
+    ///
+    /// $O(log N)$
     #[inline]
     pub fn set(&mut self, index: usize, value: impl Into<T>) {
         self.update(index, |_| value.into());
     }
 
-    /// O(log N)
+    /// # 関数による更新
+    ///
+    /// ## 計算量
+    ///
+    /// $O(log N)$
     #[inline]
     pub fn update<F>(&mut self, index: usize, update_fn: F)
     where
@@ -257,11 +309,262 @@ where
             panic!("index out of range: {}", index);
         }
         let mut index = self.leaf_of(index);
-        self.tree[index] = update_fn(&self.tree[index]);
+        *unsafe { self.tree.get_unchecked_mut(index) } =
+            update_fn(unsafe { self.tree.get_unchecked(index) });
         while index > self.root_node() {
-            index = self.parent_index(index);
+            index = self.parent_tree_index(index);
             let (left, right) = self.children_indices(index);
-            self.tree[index] = self.monoid.op(&self.tree[left], &self.tree[right]);
+            *unsafe { self.tree.get_unchecked_mut(index) } = self
+                .monoid
+                .op(unsafe { self.tree.get_unchecked(left) }, unsafe {
+                    self.tree.get_unchecked(right)
+                });
+        }
+    }
+
+    #[inline]
+    fn range_of_node(&self, mut tree_index: usize) -> (usize, usize) {
+        debug_assert!(1 <= tree_index && tree_index < self.tree.len());
+        // TODO: Use bit operations to make it faster ?
+        let mut len = 1;
+        while tree_index < self.len2 {
+            len *= 2;
+            tree_index *= 2;
+        }
+        tree_index -= self.len2;
+        (tree_index, tree_index + len)
+    }
+
+    #[inline]
+    fn range_len_of_node(&self, tree_index: usize) -> usize {
+        let (l, r) = self.range_of_node(tree_index);
+        r - l
+    }
+
+    /// # 始端に向けて探す探索
+    /// 単調な `cond_fn` と `r` について、 `cond_fn(fold(l..r), r)` を満たす
+    /// `r` 未満で最小の値 `l` を返す。
+    /// そのような値がなければ `r` を返す。
+    /// `cond_fn(fold(r..r), r) == true` であれば整合するが、これが呼ばれることはない。
+    ///
+    /// # Panic-free Preconditions
+    /// - `l <= self.len()`
+    /// - `cond_fn(fold(l..x), x)` は `x` について単調に `true` から `false` に変化する
+    ///   - 例:
+    ///   - `cond_fn(fold(9..9), 9) == true`
+    ///   - `cond_fn(fold(8..9), 8) == true`
+    ///   - `cond_fn(fold(7..9), 7) == true`
+    ///   - `cond_fn(fold(6..9), 6) == true`
+    ///   - `cond_fn(fold(5..9), 5) == false`
+    ///   - `cond_fn(fold(4..9), 4) == false`
+    ///   - `cond_fn(fold(3..9), 3) == false`
+    ///   - このとき、6を返す
+    ///
+    /// # 計算量
+    ///
+    /// $N$ を `len()` とする。
+    /// - ステップ数、 `cond_fn` の呼び出し回数、 `monoid.op` の呼び出し回数がすべて $O(\log N)$
+    ///
+    /// # 例
+    /// ```
+    /// use segment_tree::*;
+    /// use max_monoid::MaxMonoid;
+    /// let mut seg
+    ///    = segment_tree_new_transparent!(MaxMonoid<_>, vec![1, 4, 2, 3, 8, 3, 4]);
+    /// assert_eq!(seg.find_index_to_start(4, |x, _| x < 3), 4);
+    /// assert_eq!(seg.find_index_to_start(4, |x, _| x < 4), 2);
+    /// assert_eq!(seg.find_index_to_start(4, |x, _| x < 8), 0);
+    /// ```
+    #[inline]
+    pub fn find_index_to_start<F>(&self, r: usize, cond_fn: F) -> usize
+    where
+        F: Fn(U, usize) -> bool,
+    {
+        assert!(
+            r <= self.len(),
+            "r out of range: r={}, len={}",
+            r,
+            self.len(),
+        );
+        if r == 0 {
+            return 0;
+        }
+        let mut done = self.monoid.id();
+        let mut done_l = r;
+        let mut cur = self.leaf_of(r - 1);
+        let mut cur_len: usize = 1;
+        loop {
+            // 不変量:
+            // - `fold(done_l..r) == done`
+            // - `cur_len` はノード `cur` の長さ
+            // - `done == fold(done_l..r)`
+            // - `done_l` 超過に答えはない
+
+            if cfg!(test) {
+                debug_assert_eq!(self.range_len_of_node(cur), cur_len);
+            }
+
+            macro_rules! cond {
+                () => {
+                    cond_fn(
+                        (self.to_return)(
+                            &self
+                                .monoid
+                                .op(unsafe { self.tree.get_unchecked(cur) }, &done),
+                        ),
+                        done_l + cur_len,
+                    )
+                };
+            }
+
+            macro_rules! go_left {
+                () => {
+                    done = self
+                        .monoid
+                        .op(unsafe { self.tree.get_unchecked(cur) }, &done);
+                    done_l -= cur_len;
+                    cur -= 1;
+                };
+            }
+
+            // ノード `cur` が右側の子である間、 `cur` を親に置き換える
+            while cur % 2 == 0 {
+                cur = self.parent_tree_index(cur);
+                cur_len *= 2;
+            }
+            if !cond!() {
+                // 現在の `cur` の左端は対象ではないから、
+                // `cur` ノードの葉に対応するインデックスが対象であることがわかる
+
+                while !self.is_leaf(cur) {
+                    cur = self.children_indices(cur).1;
+                    cur_len /= 2;
+                    if cond!() {
+                        go_left!();
+                    }
+                }
+                return self.index_of_leaf(cur + 1);
+            }
+
+            // `cur` が2冪であれば、 `cur` がその高さにおける左端まで行ったということなので終了
+            if cur & 0_usize.wrapping_sub(cur) == cur {
+                return 0;
+            }
+
+            go_left!();
+        }
+    }
+
+    /// # 終端に向けて探す探索
+    /// 単調な `cond_fn` と `l` について、 `cond_fn(fold(l..r), r)` を満たさない
+    /// `l` 以上 `len()` 未満で最小の値 `r` を返す。
+    /// `len()` 未満でそのような値がなければ、 `len()` を返す。
+    /// `cond_fn(fold(l..len()), len()) == false`
+    /// であれば整合するが、実際にこれが呼ばれることはない。
+    ///
+    /// # Panic-free Preconditions
+    /// - `l < self.len()`
+    /// - `cond_fn(fold(l..x), x)` は `x` について単調に `true` から `false` に変化する
+    ///   - 例:
+    ///   - `cond_fn(fold(3..3), 3) == true`
+    ///   - `cond_fn(fold(3..4), 4) == true`
+    ///   - `cond_fn(fold(3..5), 5) == true`
+    ///   - `cond_fn(fold(3..6), 6) == false`
+    ///   - `cond_fn(fold(3..7), 7) == false`
+    ///   - `cond_fn(fold(3..8), 8) == false`
+    ///   - `cond_fn(fold(3..9), 9) == false`
+    ///   - このとき、5を返す
+    ///
+    /// # 計算量
+    ///
+    /// $N$ を `len()` とする。
+    /// - ステップ数、 `cond_fn` の呼び出し回数、 `monoid.op` の呼び出し回数がすべて $O(\log N)$
+    ///
+    /// # 例
+    /// ```
+    /// use segment_tree::*;
+    /// use max_monoid::MaxMonoid;
+    /// let mut seg
+    ///    = segment_tree_new_transparent!(MaxMonoid<_>, vec![1, 4, 2, 3, 8, 3, 4]);
+    /// assert_eq!(seg.find_index_to_end(0, |x, _| x < 4), 1);
+    /// assert_eq!(seg.find_index_to_end(0, |x, _| x < 8), 4);
+    /// assert_eq!(seg.find_index_to_end(0, |x, _| x < 100), 7);
+    /// ```
+    #[inline]
+    pub fn find_index_to_end<F>(&self, l: usize, cond_fn: F) -> usize
+    where
+        F: Fn(U, usize) -> bool,
+    {
+        assert!(
+            l < self.len(),
+            "l out of range: l={}, len={}",
+            l,
+            self.len(),
+        );
+        let mut done = self.monoid.id();
+        let mut done_r = l;
+        let mut cur = self.leaf_of(l);
+        let mut cur_len: usize = 1;
+        loop {
+            // 不変量:
+            // - `fold(l..done_r) == done`
+            // - `cur_len` はノード `cur` の長さ
+            // - `done == fold(l..done_r)`
+            // - `done_r` 未満に答えはない
+
+            if cfg!(test) {
+                debug_assert_eq!(self.range_len_of_node(cur), cur_len);
+            }
+
+            macro_rules! cond {
+                () => {
+                    (done_r + cur_len) < self.len
+                        && cond_fn(
+                            (self.to_return)(
+                                &self
+                                    .monoid
+                                    .op(&done, unsafe { self.tree.get_unchecked(cur) }),
+                            ),
+                            done_r + cur_len,
+                        )
+                };
+            }
+
+            macro_rules! go_right {
+                () => {
+                    done = self
+                        .monoid
+                        .op(&done, unsafe { self.tree.get_unchecked(cur) });
+                    done_r += cur_len;
+                    cur += 1;
+                };
+            }
+
+            // ノード `cur` が左側の子である間、 `cur` を親に置き換える
+            while cur % 2 == 0 {
+                cur = self.parent_tree_index(cur);
+                cur_len *= 2;
+            }
+            if !cond!() {
+                // 現在の `cur` の右端は対象ではないから、
+                // `cur` 内のノードの葉に対応するインデックスが対象であることがわかる
+
+                while !self.is_leaf(cur) {
+                    cur = self.children_indices(cur).0;
+                    cur_len /= 2;
+                    if cond!() {
+                        go_right!();
+                    }
+                }
+                return self.index_of_leaf(cur);
+            }
+
+            go_right!();
+
+            // `cur` が2冪であれば、 `cur-1` がその高さにおける右端まで行ったということなので終了
+            if cur & 0_usize.wrapping_sub(cur) == cur {
+                return self.len;
+            }
         }
     }
 
@@ -271,4 +574,4 @@ where
 }
 
 #[cfg(test)]
-mod test;
+mod segment_tree_test;
