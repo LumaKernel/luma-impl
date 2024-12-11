@@ -81,8 +81,8 @@ where
             tree.push(e);
         }
         for i in 0..len2 - 1 {
-            let right = &tree[i * 2];
-            let left = &tree[i * 2 + 1];
+            let right = &unsafe { tree.get_unchecked(i * 2) };
+            let left = &unsafe { tree.get_unchecked(i * 2 + 1) };
             tree.push(monoid.op(left, right));
         }
         tree.push(monoid.id());
@@ -256,12 +256,16 @@ where
 
         while l < r {
             if l % 2 == 1 {
-                left_folded = self.monoid.op(&left_folded, &self.tree[l]);
+                left_folded = self
+                    .monoid
+                    .op(&left_folded, unsafe { self.tree.get_unchecked(l) });
                 l += 1;
             }
             if r % 2 == 1 {
                 r -= 1;
-                right_folded = self.monoid.op(&self.tree[r], &right_folded);
+                right_folded = self
+                    .monoid
+                    .op(unsafe { self.tree.get_unchecked(r) }, &right_folded);
             }
             l = self.parent_tree_index(l);
             r = self.parent_tree_index(r);
@@ -278,7 +282,7 @@ where
     #[inline(always)]
     pub fn get(&self, index: usize) -> U {
         assert!(index < self.len, "index out of range: {}", index);
-        (self.to_return)(&self.tree[self.leaf_of(index)])
+        (self.to_return)(unsafe { self.tree.get_unchecked(self.leaf_of(index)) })
     }
 
     /// # セット
@@ -305,11 +309,16 @@ where
             panic!("index out of range: {}", index);
         }
         let mut index = self.leaf_of(index);
-        self.tree[index] = update_fn(&self.tree[index]);
+        *unsafe { self.tree.get_unchecked_mut(index) } =
+            update_fn(unsafe { self.tree.get_unchecked(index) });
         while index > self.root_node() {
             index = self.parent_tree_index(index);
             let (left, right) = self.children_indices(index);
-            self.tree[index] = self.monoid.op(&self.tree[left], &self.tree[right]);
+            *unsafe { self.tree.get_unchecked_mut(index) } = self
+                .monoid
+                .op(unsafe { self.tree.get_unchecked(left) }, unsafe {
+                    self.tree.get_unchecked(right)
+                });
         }
     }
 
@@ -398,7 +407,11 @@ where
             macro_rules! cond {
                 () => {
                     cond_fn(
-                        (self.to_return)(&self.monoid.op(&self.tree[cur], &done)),
+                        (self.to_return)(
+                            &self
+                                .monoid
+                                .op(unsafe { self.tree.get_unchecked(cur) }, &done),
+                        ),
                         done_l + cur_len,
                     )
                 };
@@ -406,7 +419,9 @@ where
 
             macro_rules! go_left {
                 () => {
-                    done = self.monoid.op(&self.tree[cur], &done);
+                    done = self
+                        .monoid
+                        .op(unsafe { self.tree.get_unchecked(cur) }, &done);
                     done_l -= cur_len;
                     cur -= 1;
                 };
@@ -505,7 +520,11 @@ where
                 () => {
                     (done_r + cur_len) < self.len
                         && cond_fn(
-                            (self.to_return)(&self.monoid.op(&done, &self.tree[cur])),
+                            (self.to_return)(
+                                &self
+                                    .monoid
+                                    .op(&done, unsafe { self.tree.get_unchecked(cur) }),
+                            ),
                             done_r + cur_len,
                         )
                 };
@@ -513,7 +532,9 @@ where
 
             macro_rules! go_right {
                 () => {
-                    done = self.monoid.op(&done, &self.tree[cur]);
+                    done = self
+                        .monoid
+                        .op(&done, unsafe { self.tree.get_unchecked(cur) });
                     done_r += cur_len;
                     cur += 1;
                 };
