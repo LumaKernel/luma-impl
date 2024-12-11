@@ -183,6 +183,7 @@ dependencies = [
  "add-monoid",
  "ceil-log2",
  "max-monoid",
+ "min-monoid",
  "monoid",
  "rand",
  "rand_xoshiro",
