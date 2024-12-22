@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-segment-tree = { path = "../segment-tree.lib" }
-min-monoid = { path = "../min-monoid.lib" }
 max-exists = { path = "../max-exists.lib" }
+min-monoid = { path = "../min-monoid.lib" }
+segment-tree = { path = "../segment-tree.lib" }

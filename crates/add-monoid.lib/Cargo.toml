@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-monoid = { path = "../monoid.lib" }
 commutative-ring = { path = "../commutative-ring.lib" }
-transparent-trait = { path = "../transparent-trait.lib" }
+monoid = { path = "../monoid.lib" }
 transparent-derive = { path = "../transparent-derive.lib" }
+transparent-trait = { path = "../transparent-trait.lib" }

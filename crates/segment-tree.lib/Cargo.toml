@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-monoid = { path = "../monoid.lib" }
 access-range = { path = "../access-range.lib" }
-transparent-trait = { path = "../transparent-trait.lib" }
 ceil-log2 = { path = "../ceil-log2.lib" }
+monoid = { path = "../monoid.lib" }
+transparent-trait = { path = "../transparent-trait.lib" }
 
 [dev-dependencies]
 min-monoid = { path = "../min-monoid.lib" }

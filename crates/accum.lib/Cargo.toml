@@ -4,9 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-group = { path = "../group.lib" }
-commutative-ring = { path = "../commutative-ring.lib" }
 access-range = { path = "../access-range.lib" }
+commutative-ring = { path = "../commutative-ring.lib" }
+group = { path = "../group.lib" }
 
 [dev-dependencies]
 tuple-vec = { path = "../tuple-vec.lib" }

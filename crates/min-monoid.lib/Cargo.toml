@@ -6,5 +6,5 @@ edition = "2021"
 [dependencies]
 max-exists = { path = "../max-exists.lib" }
 monoid = { path = "../monoid.lib" }
-transparent-trait = { path = "../transparent-trait.lib" }
 transparent-derive = { path = "../transparent-derive.lib" }
+transparent-trait = { path = "../transparent-trait.lib" }
