@@ -1,0 +1,15 @@
+[package]
+name = "lazy-segment-tree"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+monoid-action = { path = "../monoid-action.lib" }
+max-exists = { path = "../max-exists.lib" }
+min-exists = { path = "../min-exists.lib" }
+access-range = { path = "../access-range.lib" }
+ceil-log2 = { path = "../ceil-log2.lib" }
+
+[dev-dependencies]
+rand = "0.8.5"
+rand_xoshiro = "0.6.0"

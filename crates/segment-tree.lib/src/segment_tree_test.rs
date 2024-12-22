@@ -48,7 +48,7 @@ fn test_add_full() {
             .map(|_| rng.gen_range(-10000000..10000000))
             .collect::<Vec<_>>();
         let mut seg = segment_tree_new_transparent!(AddMonoid<_>, v.clone());
-        assert_eq!(seg.len(), n);
+        assert_eq!(seg.size(), n);
 
         if n == 0 {
             continue;
@@ -146,7 +146,7 @@ fn test_max_full() {
         };
         let mut v = (0..n).map(|_| rng.gen_range(0..width)).collect::<Vec<_>>();
         let mut seg = segment_tree_new_transparent!(MaxMonoid<_>, v.clone());
-        assert_eq!(seg.len(), n);
+        assert_eq!(seg.size(), n);
 
         if n == 0 {
             continue;

@@ -72,6 +72,19 @@ name = "group"
 version = "0.1.0"
 
 [[package]]
+name = "lazy-segment-tree"
+version = "0.1.0"
+dependencies = [
+ "access-range",
+ "ceil-log2",
+ "max-exists",
+ "min-exists",
+ "monoid-action",
+ "rand",
+ "rand_xoshiro",
+]
+
+[[package]]
 name = "libc"
 version = "0.2.164"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -107,6 +120,10 @@ dependencies = [
 
 [[package]]
 name = "monoid"
+version = "0.1.0"
+
+[[package]]
+name = "monoid-action"
 version = "0.1.0"
 
 [[package]]
