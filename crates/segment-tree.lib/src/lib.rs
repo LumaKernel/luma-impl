@@ -1,4 +1,3 @@
-#![allow(clippy::type_complexity)]
 use access_range::IntoAccessRange;
 use ceil_log2::ceil_log2_usize;
 use monoid::{Monoid, QuickMonoid};
