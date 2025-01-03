@@ -66,5 +66,6 @@ imp_uint!(u16);
 imp_uint!(u32);
 imp_uint!(u64);
 imp_uint!(u128);
+imp_uint!(usize);
 imp_float!(f32);
 imp_float!(f64);

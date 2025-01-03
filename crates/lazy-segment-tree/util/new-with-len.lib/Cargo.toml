@@ -6,3 +6,4 @@ edition = "2021"
 [dependencies]
 lazy-segment-tree = { path = "../../core.lib" }
 lazy-segment-tree-util-type = { path = "../type.lib" }
+shrink-provider = { path = "../../../shrink/provider.lib" }
