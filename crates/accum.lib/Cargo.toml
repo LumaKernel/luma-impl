@@ -5,8 +5,8 @@ edition = "2021"
 
 [dependencies]
 access-range = { path = "../access-range.lib" }
-commutative-ring = { path = "../commutative-ring.lib" }
-group = { path = "../group.lib" }
+commutative-ring = { path = "../algebraic-structures.col/commutative-ring.lib" }
+group = { path = "../algebraic-structures.col/group.lib" }
 
 [dev-dependencies]
 tuple-vec = { path = "../tuple-vec.lib" }

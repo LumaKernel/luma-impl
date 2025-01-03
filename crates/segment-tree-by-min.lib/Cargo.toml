@@ -5,5 +5,5 @@ edition = "2021"
 
 [dependencies]
 max-exists = { path = "../max-exists.lib" }
-min-monoid = { path = "../min-monoid.lib" }
+min-monoid = { path = "../algebraic-structures.col/monoid.col/min-monoid.lib" }
 segment-tree = { path = "../segment-tree.lib" }

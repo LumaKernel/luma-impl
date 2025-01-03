@@ -4,6 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-max-monoid = { path = "../max-monoid.lib" }
+max-monoid = { path = "../algebraic-structures.col/monoid.col/max-monoid.lib" }
 min-exists = { path = "../min-exists.lib" }
 segment-tree = { path = "../segment-tree.lib" }

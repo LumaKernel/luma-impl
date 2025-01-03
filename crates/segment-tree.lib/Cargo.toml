@@ -6,12 +6,12 @@ edition = "2021"
 [dependencies]
 access-range = { path = "../access-range.lib" }
 ceil-log2 = { path = "../ceil-log2.lib" }
-monoid = { path = "../monoid.lib" }
+monoid = { path = "../algebraic-structures.col/monoid.col/monoid.lib" }
 transparent-trait = { path = "../transparent-trait.lib" }
 
 [dev-dependencies]
-min-monoid = { path = "../min-monoid.lib" }
-max-monoid = { path = "../max-monoid.lib" }
-add-monoid = { path = "../add-monoid.lib" }
+add-monoid = { path = "../algebraic-structures.col/monoid.col/add-monoid.lib" }
+max-monoid = { path = "../algebraic-structures.col/monoid.col/max-monoid.lib" }
+min-monoid = { path = "../algebraic-structures.col/monoid.col/min-monoid.lib" }
 rand = "0.8.5"
 rand_xoshiro = "0.6.0"

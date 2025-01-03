@@ -463,7 +463,6 @@ where
 /// seg.set(4, 0);
 /// assert_eq!(seg.fold(..), 4);
 /// ```
-#[doc = include_str!("../../../monoid-action.lib/trait_description.md")]
 #[inline]
 pub fn lazy_segment_tree_new<T, A, Op, Id, ActOp, ActId, ActApp>(
     vec: Vec<T>,

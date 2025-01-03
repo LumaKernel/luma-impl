@@ -1,0 +1,10 @@
+[package]
+name = "min-monoid"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+max-exists = { path = "../../../max-exists.lib" }
+monoid = { path = "../monoid.lib" }
+transparent-derive = { path = "../../../transparent-derive.lib" }
+transparent-trait = { path = "../../../transparent-trait.lib" }
