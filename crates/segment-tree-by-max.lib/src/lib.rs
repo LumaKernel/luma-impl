@@ -1,4 +1,3 @@
-#![allow(clippy::type_complexity)]
 use max_monoid::MaxMonoid;
 use min_exists::MinExists;
 use segment_tree::segment_tree_new_transparent;

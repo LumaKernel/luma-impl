@@ -112,18 +112,18 @@ impl Permutation {
         one_loop
     }
 
-    /// TODO: 別のライブラリへ
-    /// # 位数
-    ///
-    /// $P^k = I$ となるような最小の $k$ を返す
-    /// すべてのループ長の最小公倍数になる
-    //pub fn rank(&self) -> usize {
-    //    let mut rank = 1;
-    //    for loop_ in self.loops() {
-    //        rank = rank.lcm(&loop_.len());
-    //    }
-    //    rank
-    //}
+    // TODO: 別のライブラリへ
+    // /// # 位数
+    // ///
+    // /// $P^k = I$ となるような最小の $k$ を返す
+    // /// すべてのループ長の最小公倍数になる
+    // pub fn rank(&self) -> usize {
+    //     let mut rank = 1;
+    //     for loop_ in self.loops() {
+    //         rank = rank.lcm(&loop_.len());
+    //     }
+    //     rank
+    // }
 
     /// # 互換
     ///

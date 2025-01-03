@@ -1,4 +1,3 @@
-#![allow(clippy::type_complexity)]
 use lazy_segment_tree::LazySegmentTree;
 use lazy_segment_tree_util_new_with_len::lazy_segment_tree_new_with_len;
 use lazy_segment_tree_util_type::lazy_seg_type;

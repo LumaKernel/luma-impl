@@ -1,4 +1,3 @@
-#![allow(clippy::type_complexity)]
 use lazy_segment_tree::LazySegmentTree;
 use lazy_segment_tree_util_set_max_count::lazy_segment_tree_new_set_max_count_general;
 use lazy_segment_tree_util_type::lazy_seg_type;

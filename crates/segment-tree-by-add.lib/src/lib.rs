@@ -1,4 +1,3 @@
-#![allow(clippy::type_complexity)]
 use add_monoid::AddMonoid;
 use commutative_ring::CommutativeRing;
 use segment_tree::segment_tree_new_transparent;
