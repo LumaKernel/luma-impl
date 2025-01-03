@@ -145,6 +145,7 @@ dependencies = [
 name = "lazy-segment-tree-util-add-min-count"
 version = "0.1.0"
 dependencies = [
+ "commutative-ring",
  "lazy-segment-tree",
  "lazy-segment-tree-util-type",
  "max-exists",
@@ -291,6 +292,9 @@ dependencies = [
 [[package]]
 name = "min-count"
 version = "0.1.0"
+dependencies = [
+ "int",
+]
 
 [[package]]
 name = "min-exists"
@@ -318,6 +322,7 @@ version = "0.1.0"
 name = "paint-rect-calc-area"
 version = "0.1.0"
 dependencies = [
+ "commutative-ring",
  "int",
  "lazy-segment-tree-util-add-min-count",
  "shrink",
@@ -446,6 +451,9 @@ dependencies = [
 [[package]]
 name = "shrink-provider"
 version = "0.1.0"
+dependencies = [
+ "int",
+]
 
 [[package]]
 name = "syn"

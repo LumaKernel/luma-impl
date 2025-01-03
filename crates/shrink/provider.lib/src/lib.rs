@@ -1,7 +1,8 @@
+use int::UnsignedInt;
 use std::rc::Rc;
 
 pub trait ShrinkProvider {
-    type USize;
+    type USize: UnsignedInt;
     fn size_of_index(&self, index: usize) -> Self::USize;
 }
 #[derive(Clone, Copy, Debug, Default)]
