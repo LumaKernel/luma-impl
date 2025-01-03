@@ -1,0 +1,9 @@
+[package]
+name = "paint-rect-calc-area"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+int = { path = "../algebraic-structures.col/int.lib" }
+lazy-segment-tree-util-add-min-count = { path = "../lazy-segment-tree/util/add-min-count.lib" }
+shrink = { path = "../shrink/core.lib" }

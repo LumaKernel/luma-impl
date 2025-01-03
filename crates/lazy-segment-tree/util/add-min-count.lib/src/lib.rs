@@ -2,6 +2,7 @@ use lazy_segment_tree::{lazy_segment_tree_new, LazySegmentTree};
 use lazy_segment_tree_util_type::lazy_seg_type;
 use max_exists::MaxExists;
 use min_count::MinCount;
+use shrink_provider::{NormalShrink, NormalShrink};
 use std::ops;
 
 /// 遅延セグメントツリー add + min count
@@ -21,7 +22,7 @@ use std::ops;
 /// seg.act(0, -1);
 /// assert_eq!(seg.fold(..), MinCount { min: -2, count: 1 });
 /// ```
-pub fn lazy_segment_tree_new_add_min_count<T>(
+pub fn lazy_segment_tree_new_add_min_count_shrinkable<T>(
     vec: Vec<T>,
 ) -> lazy_seg_type!(
    T = MinCount<T>,

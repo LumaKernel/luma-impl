@@ -72,6 +72,15 @@ name = "group"
 version = "0.1.0"
 
 [[package]]
+name = "int"
+version = "0.1.0"
+dependencies = [
+ "commutative-ring",
+ "max-exists",
+ "min-exists",
+]
+
+[[package]]
 name = "lazy-segment-tree"
 version = "0.1.0"
 dependencies = [
@@ -140,6 +149,7 @@ dependencies = [
  "lazy-segment-tree-util-type",
  "max-exists",
  "min-count",
+ "shrink-provider",
 ]
 
 [[package]]
@@ -157,6 +167,7 @@ version = "0.1.0"
 dependencies = [
  "lazy-segment-tree",
  "lazy-segment-tree-util-type",
+ "shrink-provider",
 ]
 
 [[package]]
@@ -304,6 +315,15 @@ name = "monoid-action"
 version = "0.1.0"
 
 [[package]]
+name = "paint-rect-calc-area"
+version = "0.1.0"
+dependencies = [
+ "int",
+ "lazy-segment-tree-util-add-min-count",
+ "shrink",
+]
+
+[[package]]
 name = "permutation"
 version = "0.1.0"
 
@@ -414,6 +434,18 @@ dependencies = [
  "min-monoid",
  "segment-tree",
 ]
+
+[[package]]
+name = "shrink"
+version = "0.1.0"
+dependencies = [
+ "int",
+ "shrink-provider",
+]
+
+[[package]]
+name = "shrink-provider"
+version = "0.1.0"
 
 [[package]]
 name = "syn"
