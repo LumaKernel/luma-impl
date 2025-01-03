@@ -64,4 +64,4 @@ impl_fn!(u64, ceil_log2_u64, ceil_log2_u64_unchecked);
 impl_fn!(u128, ceil_log2_u128, ceil_log2_u128_unchecked);
 
 #[cfg(test)]
-mod test;
+mod ceil_log2_test;

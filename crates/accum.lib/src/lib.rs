@@ -157,4 +157,4 @@ where
 }
 
 #[cfg(test)]
-mod test;
+mod accum_test;
