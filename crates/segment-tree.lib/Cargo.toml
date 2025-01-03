@@ -7,7 +7,7 @@ edition = "2021"
 access-range = { path = "../access-range.lib" }
 ceil-log2 = { path = "../ceil-log2.lib" }
 monoid = { path = "../algebraic-structures.col/monoid.col/monoid.lib" }
-transparent-trait = { path = "../transparent-trait.lib" }
+transparent-trait = { path = "../transparent/trait.lib" }
 
 [dev-dependencies]
 add-monoid = { path = "../algebraic-structures.col/monoid.col/add-monoid.lib" }
