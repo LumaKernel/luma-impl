@@ -13,12 +13,12 @@ where
     monoid: QuickMonoid<T, Op, Id>,
     to_return: ToReturn,
 
-    /// tree.len == 2 * len2
+    /// tree.size == 2 * size_pow2
     tree: Vec<T>,
     /// 論理的な長さ
-    len: usize,
+    size: usize,
     /// lenをそれ以上の最小の2羃に丸めたもの
-    len2: usize,
+    size_pow2: usize,
 }
 
 pub fn segment_tree_new_monoid<T, U, ToReturn>(
@@ -64,8 +64,8 @@ where
                 to_return,
 
                 tree,
-                len,
-                len2: 0,
+                size: len,
+                size_pow2: 0,
             };
         }
 
@@ -92,8 +92,8 @@ where
             monoid,
             to_return,
             tree,
-            len,
-            len2,
+            size: len,
+            size_pow2: len2,
         }
     }
 }
@@ -179,19 +179,14 @@ where
             monoid: self.monoid,
             to_return: move |x| map_fn((self.to_return)(x)),
             tree: self.tree,
-            len: self.len,
-            len2: self.len2,
+            size: self.size,
+            size_pow2: self.size_pow2,
         }
     }
 
     #[inline(always)]
-    pub fn len(&self) -> usize {
-        self.len
-    }
-
-    #[inline(always)]
-    pub fn is_empty(&self) -> bool {
-        self.tree.is_empty()
+    pub fn size(&self) -> usize {
+        self.size
     }
 
     #[inline(always)]
@@ -208,20 +203,20 @@ where
 
     #[inline(always)]
     fn leaf_of(&self, index: usize) -> usize {
-        debug_assert!(index <= self.len);
-        index + self.len2
+        debug_assert!(index <= self.size);
+        index + self.size_pow2
     }
 
     #[inline(always)]
     fn index_of_leaf(&self, tree_index: usize) -> usize {
-        debug_assert!(self.len2 <= tree_index && tree_index <= self.tree.len());
-        tree_index - self.len2
+        debug_assert!(self.size_pow2 <= tree_index && tree_index <= self.tree.len());
+        tree_index - self.size_pow2
     }
 
     #[inline(always)]
     fn is_leaf(&self, tree_index: usize) -> bool {
         debug_assert!(1 <= tree_index && tree_index < self.tree.len());
-        tree_index >= self.len2
+        tree_index >= self.size_pow2
     }
 
     #[inline(always)]
@@ -239,10 +234,10 @@ where
     /// $O(log N)$
     #[inline]
     pub fn fold(&self, range: impl IntoAccessRange<usize>) -> U {
-        if self.is_empty() {
+        if self.size == 0 {
             return (self.to_return)(&self.monoid.id());
         }
-        let range = range.into_access_range().into_range(self.len);
+        let range = range.into_access_range().into_range(self.size);
 
         if range.start >= range.end {
             return (self.to_return)(&self.monoid.id());
@@ -281,7 +276,7 @@ where
     /// $O(1)$
     #[inline(always)]
     pub fn get(&self, index: usize) -> U {
-        assert!(index < self.len, "index out of range: {}", index);
+        assert!(index < self.size, "index out of range: {}", index);
         (self.to_return)(unsafe { self.tree.get_unchecked(self.leaf_of(index)) })
     }
 
@@ -306,7 +301,7 @@ where
         F: FnOnce(&T) -> V,
         V: Into<T>,
     {
-        if index >= self.len {
+        if index >= self.size {
             panic!("index out of range: {}", index);
         }
         let mut index = self.leaf_of(index);
@@ -328,11 +323,11 @@ where
         debug_assert!(1 <= tree_index && tree_index < self.tree.len());
         // TODO: Use bit operations to make it faster ?
         let mut len = 1;
-        while tree_index < self.len2 {
+        while tree_index < self.size_pow2 {
             len *= 2;
             tree_index *= 2;
         }
-        tree_index -= self.len2;
+        tree_index -= self.size_pow2;
         (tree_index, tree_index + len)
     }
 
@@ -353,7 +348,7 @@ where
     /// これは `find_index_to_start(r, cond_fn)` と `find_index_to_end(l, cond_fn)` で同じ表現になるという点で分かりやすい。
     ///
     /// # Panic-free preconditions
-    /// - `l <= self.len()`
+    /// - `l <= self.size()`
     /// - `cond_fn(fold(x..r), x)` は `x` の減少について単調に `true` から `false` に変化する
     ///   - 例:
     ///   - `cond_fn(fold(9..9), 9) == true` (実際の値に関わらずこのように扱われ、呼ばれない)
@@ -367,7 +362,7 @@ where
     ///
     /// # 計算量
     ///
-    /// $N$ を `len()` とする。
+    /// $N$ を `size()` とする。
     /// - ステップ数、 `cond_fn` の呼び出し回数、 `monoid.op` の呼び出し回数がすべて $O(\log N)$
     ///
     /// # 例
@@ -386,10 +381,10 @@ where
         F: Fn(U, usize) -> bool,
     {
         assert!(
-            r <= self.len(),
+            r <= self.size,
             "r out of range: r={}, len={}",
             r,
-            self.len(),
+            self.size(),
         );
         if r == 0 {
             return 0;
@@ -464,7 +459,7 @@ where
 
     /// # 終端に向けて探す探索
     /// 単調な `cond_fn` と `l` について、 `cond_fn(fold(l..r), r)` を満たす
-    /// `l+1` 以上 `len()` 以下で最大の値 `r` を返す。
+    /// `l+1` 以上 `size()` 以下で最大の値 `r` を返す。
     /// そのような値がなければ `l` を返す。`cond_fn(fold(l..l), l) == true` であれば整合するが、これが呼ばれることはない。
     ///
     /// 以下のようにも言い換えられる。
@@ -473,7 +468,7 @@ where
     /// これは `find_index_to_start(r, cond_fn)` と `find_index_to_end(l, cond_fn)` で同じ表現になるという点で分かりやすい。
     ///
     /// # Panic-free preconditions
-    /// - `l < self.len()`
+    /// - `l < self.size()`
     /// - `cond_fn(fold(l..x), x)` は `x` について単調に `true` から `false` に変化する
     ///   - 例:
     ///   - `cond_fn(fold(3..3), 3) == true` (実際の値に関わらずこのように扱われ、呼ばれない)
@@ -487,7 +482,7 @@ where
     ///
     /// # 計算量
     ///
-    /// $N$ を `len()` とする。
+    /// $N$ を `size()` とする。
     /// - ステップ数、 `cond_fn` の呼び出し回数、 `monoid.op` の呼び出し回数がすべて $O(\log N)$
     ///
     /// # 例
@@ -506,10 +501,10 @@ where
         F: Fn(U, usize) -> bool,
     {
         assert!(
-            l < self.len(),
+            l < self.size(),
             "l out of range: l={}, len={}",
             l,
-            self.len(),
+            self.size(),
         );
         let mut done = self.monoid.id();
         let mut done_r = l;
@@ -529,7 +524,7 @@ where
 
             macro_rules! cond {
                 () => {
-                    (done_r + cur_len) <= self.len
+                    (done_r + cur_len) <= self.size
                         && cond_fn(
                             (self.to_return)(
                                 &self
@@ -574,7 +569,7 @@ where
 
             // `cur` が2冪であれば、 `cur-1` がその高さにおける右端まで行ったということなので終了
             if cur & 0_usize.wrapping_sub(cur) == cur {
-                return self.len;
+                return self.size;
             }
 
             cur = self.parent_tree_index(cur);

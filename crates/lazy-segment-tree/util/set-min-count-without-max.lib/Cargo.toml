@@ -1,0 +1,12 @@
+[package]
+name = "lazy-segment-tree-util-set-min-count-without-max"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+lazy-segment-tree = { path = "../../core.lib" }
+lazy-segment-tree-util-set-min-count = { path = "../set-min-count.lib" }
+lazy-segment-tree-util-type = { path = "../type.lib" }
+max-exists = { path = "../../../max-exists.lib" }
+min-count = { path = "../../../min-count.lib" }
+with-max = { path = "../../../with-max.lib" }

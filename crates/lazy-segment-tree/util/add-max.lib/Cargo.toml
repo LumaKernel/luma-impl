@@ -1,0 +1,9 @@
+[package]
+name = "lazy-segment-tree-util-add-max"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+lazy-segment-tree = { path = "../../core.lib" }
+lazy-segment-tree-util-type = { path = "../type.lib" }
+min-exists = { path = "../../../min-exists.lib" }

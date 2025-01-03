@@ -72,10 +72,196 @@ name = "group"
 version = "0.1.0"
 
 [[package]]
+name = "lazy-segment-tree"
+version = "0.1.0"
+dependencies = [
+ "access-range",
+ "ceil-log2",
+ "lazy-segment-tree-util-new-with-len",
+ "monoid-action",
+ "rand",
+ "rand_xoshiro",
+]
+
+[[package]]
+name = "lazy-segment-tree-util"
+version = "0.1.0"
+dependencies = [
+ "lazy-segment-tree",
+ "lazy-segment-tree-util-add-max",
+ "lazy-segment-tree-util-add-max-count",
+ "lazy-segment-tree-util-add-min",
+ "lazy-segment-tree-util-add-min-count",
+ "lazy-segment-tree-util-add-sum",
+ "lazy-segment-tree-util-new-with-len",
+ "lazy-segment-tree-util-new-with-range",
+ "lazy-segment-tree-util-set-max",
+ "lazy-segment-tree-util-set-max-count",
+ "lazy-segment-tree-util-set-min",
+ "lazy-segment-tree-util-set-min-count",
+ "lazy-segment-tree-util-set-sum",
+ "lazy-segment-tree-util-set-sum-general",
+ "lazy-segment-tree-util-type",
+]
+
+[[package]]
+name = "lazy-segment-tree-util-add-max"
+version = "0.1.0"
+dependencies = [
+ "lazy-segment-tree",
+ "lazy-segment-tree-util-type",
+ "min-exists",
+]
+
+[[package]]
+name = "lazy-segment-tree-util-add-max-count"
+version = "0.1.0"
+dependencies = [
+ "lazy-segment-tree",
+ "lazy-segment-tree-util-type",
+ "max-count",
+ "min-exists",
+]
+
+[[package]]
+name = "lazy-segment-tree-util-add-min"
+version = "0.1.0"
+dependencies = [
+ "lazy-segment-tree",
+ "lazy-segment-tree-util-type",
+ "max-exists",
+]
+
+[[package]]
+name = "lazy-segment-tree-util-add-min-count"
+version = "0.1.0"
+dependencies = [
+ "lazy-segment-tree",
+ "lazy-segment-tree-util-type",
+ "max-exists",
+ "min-count",
+]
+
+[[package]]
+name = "lazy-segment-tree-util-add-sum"
+version = "0.1.0"
+dependencies = [
+ "lazy-segment-tree",
+ "lazy-segment-tree-util-new-with-len",
+ "lazy-segment-tree-util-type",
+]
+
+[[package]]
+name = "lazy-segment-tree-util-new-with-len"
+version = "0.1.0"
+dependencies = [
+ "lazy-segment-tree",
+ "lazy-segment-tree-util-type",
+]
+
+[[package]]
+name = "lazy-segment-tree-util-new-with-range"
+version = "0.1.0"
+dependencies = [
+ "lazy-segment-tree",
+ "lazy-segment-tree-util-type",
+]
+
+[[package]]
+name = "lazy-segment-tree-util-set-max"
+version = "0.1.0"
+dependencies = [
+ "lazy-segment-tree",
+ "lazy-segment-tree-util-type",
+ "min-exists",
+]
+
+[[package]]
+name = "lazy-segment-tree-util-set-max-count"
+version = "0.1.0"
+dependencies = [
+ "lazy-segment-tree",
+ "lazy-segment-tree-util-new-with-len",
+ "lazy-segment-tree-util-type",
+ "max-count",
+ "min-exists",
+]
+
+[[package]]
+name = "lazy-segment-tree-util-set-max-count-without-min"
+version = "0.1.0"
+dependencies = [
+ "lazy-segment-tree",
+ "lazy-segment-tree-util-set-max-count",
+ "lazy-segment-tree-util-type",
+ "max-count",
+ "min-exists",
+ "with-min",
+]
+
+[[package]]
+name = "lazy-segment-tree-util-set-min"
+version = "0.1.0"
+dependencies = [
+ "lazy-segment-tree",
+ "lazy-segment-tree-util-type",
+ "max-exists",
+]
+
+[[package]]
+name = "lazy-segment-tree-util-set-min-count"
+version = "0.1.0"
+dependencies = [
+ "lazy-segment-tree",
+ "lazy-segment-tree-util-new-with-len",
+ "lazy-segment-tree-util-type",
+ "max-exists",
+ "min-count",
+]
+
+[[package]]
+name = "lazy-segment-tree-util-set-min-count-without-max"
+version = "0.1.0"
+dependencies = [
+ "lazy-segment-tree",
+ "lazy-segment-tree-util-set-min-count",
+ "lazy-segment-tree-util-type",
+ "max-exists",
+ "min-count",
+ "with-max",
+]
+
+[[package]]
+name = "lazy-segment-tree-util-set-sum"
+version = "0.1.0"
+dependencies = [
+ "lazy-segment-tree",
+ "lazy-segment-tree-util-new-with-len",
+ "lazy-segment-tree-util-type",
+]
+
+[[package]]
+name = "lazy-segment-tree-util-set-sum-general"
+version = "0.1.0"
+dependencies = [
+ "lazy-segment-tree",
+ "lazy-segment-tree-util-new-with-len",
+ "lazy-segment-tree-util-type",
+]
+
+[[package]]
+name = "lazy-segment-tree-util-type"
+version = "0.1.0"
+
+[[package]]
 name = "libc"
 version = "0.2.164"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "433bfe06b8c75da9b2e3fbea6e5329ff87748f0b144ef75306e674c3f6f7c13f"
+
+[[package]]
+name = "max-count"
+version = "0.1.0"
 
 [[package]]
 name = "max-exists"
@@ -90,6 +276,10 @@ dependencies = [
  "transparent-derive",
  "transparent-trait",
 ]
+
+[[package]]
+name = "min-count"
+version = "0.1.0"
 
 [[package]]
 name = "min-exists"
@@ -107,6 +297,10 @@ dependencies = [
 
 [[package]]
 name = "monoid"
+version = "0.1.0"
+
+[[package]]
+name = "monoid-action"
 version = "0.1.0"
 
 [[package]]
@@ -263,6 +457,20 @@ name = "wasi"
 version = "0.11.0+wasi-snapshot-preview1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9c8d87e72b64a3b4db28d11ce29237c246188f4f51057d65a7eab63b7987e423"
+
+[[package]]
+name = "with-max"
+version = "0.1.0"
+dependencies = [
+ "max-exists",
+]
+
+[[package]]
+name = "with-min"
+version = "0.1.0"
+dependencies = [
+ "min-exists",
+]
 
 [[package]]
 name = "zerocopy"

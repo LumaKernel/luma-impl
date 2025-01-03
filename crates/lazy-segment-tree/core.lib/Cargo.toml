@@ -1,0 +1,14 @@
+[package]
+name = "lazy-segment-tree"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+access-range = { path = "../../access-range.lib" }
+ceil-log2 = { path = "../../ceil-log2.lib" }
+monoid-action = { path = "../../algebraic-structures.col/monoid.col/monoid-action.lib" }
+
+[dev-dependencies]
+lazy-segment-tree-util-new-with-len = { path = "../util/new-with-len.lib" }
+rand = "0.8.5"
+rand_xoshiro = "0.6.0"
