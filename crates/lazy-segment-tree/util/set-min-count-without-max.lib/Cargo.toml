@@ -7,6 +7,6 @@ edition = "2021"
 lazy-segment-tree = { path = "../../core.lib" }
 lazy-segment-tree-util-set-min-count = { path = "../set-min-count.lib" }
 lazy-segment-tree-util-type = { path = "../type.lib" }
-max-exists = { path = "../../../max-exists.lib" }
+max-exists = { path = "../../../algebraic-structures.col/ord.col/max-exists.lib" }
 min-count = { path = "../../../min-count.lib" }
 with-max = { path = "../../../with-max.lib" }

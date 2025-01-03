@@ -4,4 +4,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-max-exists = { path = "../max-exists.lib" }
+max-exists = { path = "../algebraic-structures.col/ord.col/max-exists.lib" }

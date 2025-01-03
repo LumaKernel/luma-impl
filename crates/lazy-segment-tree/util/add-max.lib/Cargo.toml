@@ -6,4 +6,4 @@ edition = "2021"
 [dependencies]
 lazy-segment-tree = { path = "../../core.lib" }
 lazy-segment-tree-util-type = { path = "../type.lib" }
-min-exists = { path = "../../../min-exists.lib" }
+min-exists = { path = "../../../algebraic-structures.col/ord.col/min-exists.lib" }
