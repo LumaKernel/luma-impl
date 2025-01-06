@@ -157,7 +157,15 @@ impl<T: Int> PaintRectCalcAreaBuilder<T> {
 /// // ##.
 /// // ###
 /// // .##
-/// assert_eq!(paint_rect().add(0, 0, 2, 2).add(1, 1, 3, 3).build(), 7_u32);
+/// assert_eq!(
+///     paint_rect()
+///         // 矩形 [0, 2) x [0, 2) の追加
+///         .add(0, 0, 2, 2)
+///         // 矩形 [1, 2] x [1, 2] の追加
+///         .add_inclusive(1, 1, 2, 2)
+///         .calc_area(),
+///     7_u32,
+/// );
 /// ```
 pub fn paint_rect<T: Int>() -> PaintRectCalcAreaBuilder<T> {
     PaintRectCalcAreaBuilder::new()
