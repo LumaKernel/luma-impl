@@ -1,15 +1,17 @@
 use commutative_ring::CommutativeRing;
+use commutative_ring_ord::CommutativeRingOrd;
 use max_exists::MaxExists;
 use min_exists::MinExists;
 use std::cmp;
-use std::fmt::Debug;
+use std::fmt::{Debug, Display};
 use std::ops;
 
 macro_rules! int_trait {
-    ($t:ident { $($tt:tt)* }) => {
+    ($t:ident $(: $extra_bound0:path $(, $extra_bounds:path)*)? { $($body:tt)* }) => {
         pub trait $t:
             Clone
             + Copy
+            + Display
             + Default
             + Debug
             + cmp::Ord
@@ -27,13 +29,14 @@ macro_rules! int_trait {
             + ops::RemAssign
             + MinExists
             + MaxExists
+            + $($extra_bound0 $(+ $extra_bounds)*)?
         {
-            $($tt)*
+            $($body)*
         }
     }
 }
 
-int_trait!(SignedInt {
+int_trait!(SignedInt: ops::Neg, CommutativeRingOrd {
     type UnsignedIntSameSize: UnsignedInt;
     fn to_same_size_unsigned_int(self) -> Self::UnsignedIntSameSize;
 });
@@ -98,4 +101,10 @@ impl_int!(
     (u64, i64, u64),
     (u128, i128, u128),
     (usize, isize, usize),
+    (i8, i8, u8),
+    (i16, i16, u16),
+    (i32, i32, u32),
+    (i64, i64, u64),
+    (i128, i128, u128),
+    (isize, isize, usize),
 );

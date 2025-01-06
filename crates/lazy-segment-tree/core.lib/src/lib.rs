@@ -254,7 +254,7 @@ where
     #[inline]
     unsafe fn eval_unchecked(&mut self, tree_index: usize) {
         debug_assert!(1 <= tree_index && tree_index < self.tree.len());
-        //if tree_index >= self.size_pow2 {
+
         if !self.is_leaf(tree_index) {
             let (left_new, right_new) = {
                 let lazy_it = self.lazy.get_unchecked(tree_index);
@@ -373,9 +373,17 @@ where
         }
         unsafe { self.prop_up_unchecked(tl) };
         unsafe { self.prop_up_unchecked(tr - 1) };
+
+        //int tl = l, tr = r;
+        //for(l += n, r += n; l < r; l >>= 1, r >>= 1) {
+        //  if(l & 1) eval(l), lazy[l] = m, eval(l), l++;
+        //  if(r & 1) --r, eval(r), lazy[r] = m, eval(r);
+        //}
+        //propUp(tl);
+        //propUp(tr - 1);
     }
 
-    #[inline]
+    #[inline(always)]
     pub fn fold(&mut self, range: impl IntoAccessRange<usize>) -> TFolded {
         let v = self.fold_inner(range);
         (self.t_into_folded)(v)
