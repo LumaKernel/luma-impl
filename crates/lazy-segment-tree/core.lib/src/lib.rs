@@ -373,14 +373,6 @@ where
         }
         unsafe { self.prop_up_unchecked(tl) };
         unsafe { self.prop_up_unchecked(tr - 1) };
-
-        //int tl = l, tr = r;
-        //for(l += n, r += n; l < r; l >>= 1, r >>= 1) {
-        //  if(l & 1) eval(l), lazy[l] = m, eval(l), l++;
-        //  if(r & 1) --r, eval(r), lazy[r] = m, eval(r);
-        //}
-        //propUp(tl);
-        //propUp(tr - 1);
     }
 
     #[inline(always)]
