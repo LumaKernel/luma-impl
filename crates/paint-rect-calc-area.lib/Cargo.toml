@@ -1,0 +1,15 @@
+[package]
+name = "paint-rect-calc-area"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+commutative-ring = { path = "../algebraic-structures.col/commutative-ring.lib" }
+int = { path = "../algebraic-structures.col/int.lib" }
+lazy-segment-tree-util-add-min-max-count = { path = "../lazy-segment-tree/util/add-min-max-count.lib" }
+polyfill-vec-chunk-by = { path = "../polyfill/vec/chunk-by.lib" }
+shrink = { path = "../shrink/core.lib" }
+
+[dev-dependencies]
+rand = "0.8.5"
+rand_xoshiro = "0.6.0"

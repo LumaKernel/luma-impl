@@ -57,6 +57,13 @@ dependencies = [
 ]
 
 [[package]]
+name = "commutative-ring-ord"
+version = "0.1.0"
+dependencies = [
+ "commutative-ring",
+]
+
+[[package]]
 name = "getrandom"
 version = "0.2.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -70,6 +77,16 @@ dependencies = [
 [[package]]
 name = "group"
 version = "0.1.0"
+
+[[package]]
+name = "int"
+version = "0.1.0"
+dependencies = [
+ "commutative-ring",
+ "commutative-ring-ord",
+ "max-exists",
+ "min-exists",
+]
 
 [[package]]
 name = "lazy-segment-tree"
@@ -89,16 +106,13 @@ version = "0.1.0"
 dependencies = [
  "lazy-segment-tree",
  "lazy-segment-tree-util-add-max",
- "lazy-segment-tree-util-add-max-count",
  "lazy-segment-tree-util-add-min",
- "lazy-segment-tree-util-add-min-count",
+ "lazy-segment-tree-util-add-min-max-count",
  "lazy-segment-tree-util-add-sum",
  "lazy-segment-tree-util-new-with-len",
  "lazy-segment-tree-util-new-with-range",
- "lazy-segment-tree-util-set-max",
- "lazy-segment-tree-util-set-max-count",
- "lazy-segment-tree-util-set-min",
- "lazy-segment-tree-util-set-min-count",
+ "lazy-segment-tree-util-set-min-max",
+ "lazy-segment-tree-util-set-min-max-count",
  "lazy-segment-tree-util-set-sum",
  "lazy-segment-tree-util-set-sum-general",
  "lazy-segment-tree-util-type",
@@ -114,16 +128,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "lazy-segment-tree-util-add-max-count"
-version = "0.1.0"
-dependencies = [
- "lazy-segment-tree",
- "lazy-segment-tree-util-type",
- "max-count",
- "min-exists",
-]
-
-[[package]]
 name = "lazy-segment-tree-util-add-min"
 version = "0.1.0"
 dependencies = [
@@ -133,13 +137,17 @@ dependencies = [
 ]
 
 [[package]]
-name = "lazy-segment-tree-util-add-min-count"
+name = "lazy-segment-tree-util-add-min-max-count"
 version = "0.1.0"
 dependencies = [
+ "commutative-ring",
+ "commutative-ring-ord",
  "lazy-segment-tree",
  "lazy-segment-tree-util-type",
  "max-exists",
- "min-count",
+ "min-exists",
+ "min-max-count",
+ "shrink-provider",
 ]
 
 [[package]]
@@ -155,8 +163,10 @@ dependencies = [
 name = "lazy-segment-tree-util-new-with-len"
 version = "0.1.0"
 dependencies = [
+ "commutative-ring",
  "lazy-segment-tree",
  "lazy-segment-tree-util-type",
+ "shrink-provider",
 ]
 
 [[package]]
@@ -168,67 +178,27 @@ dependencies = [
 ]
 
 [[package]]
-name = "lazy-segment-tree-util-set-max"
-version = "0.1.0"
-dependencies = [
- "lazy-segment-tree",
- "lazy-segment-tree-util-type",
- "min-exists",
-]
-
-[[package]]
-name = "lazy-segment-tree-util-set-max-count"
-version = "0.1.0"
-dependencies = [
- "lazy-segment-tree",
- "lazy-segment-tree-util-new-with-len",
- "lazy-segment-tree-util-type",
- "max-count",
- "min-exists",
-]
-
-[[package]]
-name = "lazy-segment-tree-util-set-max-count-without-min"
-version = "0.1.0"
-dependencies = [
- "lazy-segment-tree",
- "lazy-segment-tree-util-set-max-count",
- "lazy-segment-tree-util-type",
- "max-count",
- "min-exists",
- "with-min",
-]
-
-[[package]]
-name = "lazy-segment-tree-util-set-min"
+name = "lazy-segment-tree-util-set-min-max"
 version = "0.1.0"
 dependencies = [
  "lazy-segment-tree",
  "lazy-segment-tree-util-type",
  "max-exists",
+ "min-exists",
 ]
 
 [[package]]
-name = "lazy-segment-tree-util-set-min-count"
+name = "lazy-segment-tree-util-set-min-max-count"
 version = "0.1.0"
 dependencies = [
+ "commutative-ring",
  "lazy-segment-tree",
  "lazy-segment-tree-util-new-with-len",
  "lazy-segment-tree-util-type",
  "max-exists",
- "min-count",
-]
-
-[[package]]
-name = "lazy-segment-tree-util-set-min-count-without-max"
-version = "0.1.0"
-dependencies = [
- "lazy-segment-tree",
- "lazy-segment-tree-util-set-min-count",
- "lazy-segment-tree-util-type",
- "max-exists",
- "min-count",
- "with-max",
+ "min-exists",
+ "min-max-count",
+ "shrink-provider",
 ]
 
 [[package]]
@@ -260,10 +230,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "433bfe06b8c75da9b2e3fbea6e5329ff87748f0b144ef75306e674c3f6f7c13f"
 
 [[package]]
-name = "max-count"
-version = "0.1.0"
-
-[[package]]
 name = "max-exists"
 version = "0.1.0"
 
@@ -278,12 +244,15 @@ dependencies = [
 ]
 
 [[package]]
-name = "min-count"
+name = "min-exists"
 version = "0.1.0"
 
 [[package]]
-name = "min-exists"
+name = "min-max-count"
 version = "0.1.0"
+dependencies = [
+ "int",
+]
 
 [[package]]
 name = "min-monoid"
@@ -304,7 +273,24 @@ name = "monoid-action"
 version = "0.1.0"
 
 [[package]]
+name = "paint-rect-calc-area"
+version = "0.1.0"
+dependencies = [
+ "commutative-ring",
+ "int",
+ "lazy-segment-tree-util-add-min-max-count",
+ "polyfill-vec-chunk-by",
+ "rand",
+ "rand_xoshiro",
+ "shrink",
+]
+
+[[package]]
 name = "permutation"
+version = "0.1.0"
+
+[[package]]
+name = "polyfill-vec-chunk-by"
 version = "0.1.0"
 
 [[package]]
@@ -413,6 +399,21 @@ dependencies = [
  "max-exists",
  "min-monoid",
  "segment-tree",
+]
+
+[[package]]
+name = "shrink"
+version = "0.1.0"
+dependencies = [
+ "int",
+ "shrink-provider",
+]
+
+[[package]]
+name = "shrink-provider"
+version = "0.1.0"
+dependencies = [
+ "int",
 ]
 
 [[package]]

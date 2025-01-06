@@ -1,0 +1,8 @@
+[package]
+name = "shrink"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+int = { path= "../../algebraic-structures.col/int.lib" }
+shrink-provider = { path= "../provider.lib" }

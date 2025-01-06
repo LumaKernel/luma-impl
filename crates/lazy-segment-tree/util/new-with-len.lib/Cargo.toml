@@ -4,5 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+commutative-ring = { path = "../../../algebraic-structures.col/commutative-ring.lib" }
 lazy-segment-tree = { path = "../../core.lib" }
 lazy-segment-tree-util-type = { path = "../type.lib" }
+shrink-provider = { path = "../../../shrink/provider.lib" }

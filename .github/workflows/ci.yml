@@ -11,7 +11,12 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        rust: [stable, '1.70.0']
+        rust:
+          - stable
+          # AtCoder, yukicoder
+          - '1.70.0'
+          # Codeforces
+          - '1.75.0'
     steps:
       - uses: actions/checkout@v4
       - uses: actions-rust-lang/setup-rust-toolchain@v1
