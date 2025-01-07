@@ -1,7 +1,9 @@
 use access_range::IntoAccessRange;
 use ceil_log2::ceil_log2_usize;
+use lazy_segment_tree_util_type::lazy_seg_type;
 use monoid_action::QuickMonoidAction;
 use std::mem;
+use transparent_trait::Transparent;
 
 pub struct LazySegmentTree<
     TFolded,
@@ -184,23 +186,14 @@ where
     pub fn set_value_setter<TSetter2>(
         self,
         fn_setter: impl Fn(TSetter2, usize) -> T,
-    ) -> LazySegmentTree<
-        TFolded,
-        TGetter,
-        TSetter2,
-        T,
-        ASetter,
-        A,
-        TIntoFolded,
-        TIntoGetter,
-        impl Fn(TSetter2, usize) -> T,
-        AFromSetter,
-        Op,
-        Id,
-        ActOp,
-        ActId,
-        ActApp,
-    > {
+    ) -> lazy_seg_type!(
+        T = T,
+        A = A,
+        TFolded = TFolded,
+        TGetter = TGetter,
+        TSetter = TSetter2,
+        ASetter = ASetter,
+    ) {
         LazySegmentTree {
             monoid_action: self.monoid_action,
             tree: self.tree,
@@ -216,26 +209,139 @@ where
         }
     }
 
+    pub fn map_value_folded<TFolded2>(
+        self,
+        map_fn: impl Fn(TFolded) -> TFolded2,
+    ) -> lazy_seg_type!(
+        T = T,
+        A = A,
+        TFolded = TFolded2,
+        TGetter = TGetter,
+        TSetter = TSetter,
+        ASetter = ASetter,
+    ) {
+        LazySegmentTree {
+            monoid_action: self.monoid_action,
+            tree: self.tree,
+            lazy: self.lazy,
+            size: self.size,
+            size_pow2: self.size_pow2,
+
+            t_into_folded: move |x| map_fn((self.t_into_folded)(x)),
+            t_into_getter: self.t_into_getter,
+            t_from_setter: self.t_from_setter,
+            a_from_setter: self.a_from_setter,
+            phantom: Default::default(),
+        }
+    }
+    pub fn map_value_getter<TGetter2>(
+        self,
+        map_fn: impl Fn(TGetter) -> TGetter2,
+    ) -> lazy_seg_type!(
+        T = T,
+        A = A,
+        TFolded = TFolded,
+        TGetter = TGetter2,
+        TSetter = TSetter,
+        ASetter = ASetter,
+    ) {
+        LazySegmentTree {
+            monoid_action: self.monoid_action,
+            tree: self.tree,
+            lazy: self.lazy,
+            size: self.size,
+            size_pow2: self.size_pow2,
+
+            t_into_folded: self.t_into_folded,
+            t_into_getter: move |x, i| map_fn((self.t_into_getter)(x, i)),
+            t_from_setter: self.t_from_setter,
+            a_from_setter: self.a_from_setter,
+            phantom: Default::default(),
+        }
+    }
+    pub fn map_value_setter<TSetter2>(
+        self,
+        map_fn: impl Fn(TSetter2, usize) -> TSetter,
+    ) -> lazy_seg_type!(
+        T = T,
+        A = A,
+        TFolded = TFolded,
+        TGetter = TGetter,
+        TSetter = TSetter2,
+        ASetter = ASetter,
+    ) {
+        LazySegmentTree {
+            monoid_action: self.monoid_action,
+            tree: self.tree,
+            lazy: self.lazy,
+            size: self.size,
+            size_pow2: self.size_pow2,
+
+            t_into_folded: self.t_into_folded,
+            t_into_getter: self.t_into_getter,
+            t_from_setter: move |x, i| (self.t_from_setter)(map_fn(x, i), i),
+            a_from_setter: self.a_from_setter,
+            phantom: Default::default(),
+        }
+    }
+
+    pub fn map_value_folded_transparent<TSetter2>(
+        self,
+    ) -> lazy_seg_type!(
+        T = T,
+        A = A,
+        TFolded = TFolded::Inner,
+        TGetter = TGetter,
+        TSetter = TSetter,
+        ASetter = ASetter,
+    )
+    where
+        TFolded: Transparent,
+    {
+        self.map_value_folded(|x| x.into_inner())
+    }
+    pub fn map_value_getter_transparent<TSetter2>(
+        self,
+    ) -> lazy_seg_type!(
+        T = T,
+        A = A,
+        TFolded = TFolded,
+        TGetter = TGetter::Inner,
+        TSetter = TSetter,
+        ASetter = ASetter,
+    )
+    where
+        TGetter: Transparent,
+    {
+        self.map_value_getter(|x| x.into_inner())
+    }
+    pub fn map_value_setter_transparent<TSetter2>(
+        self,
+    ) -> lazy_seg_type!(
+        T = T,
+        A = A,
+        TFolded = TFolded,
+        TGetter = TGetter,
+        TSetter = TSetter::Inner,
+        ASetter = ASetter,
+    )
+    where
+        TSetter: Transparent,
+    {
+        self.map_value_setter(|x, _| TSetter::from_inner(x))
+    }
+
     pub fn set_action_setter<ASetter2>(
         self,
         fn_setter: impl Fn(ASetter2) -> A,
-    ) -> LazySegmentTree<
-        TFolded,
-        TGetter,
-        TSetter,
-        T,
-        ASetter2,
-        A,
-        TIntoFolded,
-        TIntoGetter,
-        TFromSetter,
-        impl Fn(ASetter2) -> A,
-        Op,
-        Id,
-        ActOp,
-        ActId,
-        ActApp,
-    > {
+    ) -> lazy_seg_type!(
+        T = T,
+        A = A,
+        TFolded = TFolded,
+        TGetter = TGetter,
+        TSetter = TSetter,
+        ASetter = ASetter2,
+    ) {
         LazySegmentTree {
             monoid_action: self.monoid_action,
             tree: self.tree,
@@ -249,6 +355,46 @@ where
             a_from_setter: fn_setter,
             phantom: Default::default(),
         }
+    }
+    pub fn map_action_setter<ASetter2>(
+        self,
+        map_fn: impl Fn(ASetter2) -> ASetter,
+    ) -> lazy_seg_type!(
+        T = T,
+        A = A,
+        TFolded = TFolded,
+        TGetter = TGetter,
+        TSetter = TSetter,
+        ASetter = ASetter2,
+    ) {
+        LazySegmentTree {
+            monoid_action: self.monoid_action,
+            tree: self.tree,
+            lazy: self.lazy,
+            size: self.size,
+            size_pow2: self.size_pow2,
+
+            t_into_folded: self.t_into_folded,
+            t_into_getter: self.t_into_getter,
+            t_from_setter: self.t_from_setter,
+            a_from_setter: move |x| (self.a_from_setter)(map_fn(x)),
+            phantom: Default::default(),
+        }
+    }
+    pub fn map_action_setter_transparent<ASetter2>(
+        self,
+    ) -> lazy_seg_type!(
+        T = T,
+        A = A,
+        TFolded = TFolded,
+        TGetter = TGetter,
+        TSetter = TSetter,
+        ASetter = ASetter::Inner,
+    )
+    where
+        ASetter: Transparent,
+    {
+        self.map_action_setter(|x| ASetter::from_inner(x))
     }
 
     #[inline]

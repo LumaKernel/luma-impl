@@ -41,7 +41,7 @@ macro_rules! f {
             T: Clone,
             SP: ShrinkProvider + Clone,
         {
-            pub fn new_shrinkable(vec: Vec<T>, sp: SP) -> Self {
+            pub fn new(vec: Vec<T>, sp: SP) -> Self {
                 Self {
                     vec,
                     t_partial_ord: None,
@@ -192,14 +192,14 @@ macro_rules! f {
             T: Clone,
             SP: ShrinkProvider + Clone,
         {
-            $builder_name::new_shrinkable(vec, sp)
+            $builder_name::new(vec, sp)
         }
 
         pub fn $fn_builder<T>(vec: Vec<T>) -> $builder_name<T, NormalShrink>
         where
             T: Clone,
         {
-            $builder_name::new_shrinkable(vec, NormalShrink)
+            $builder_name::new(vec, NormalShrink)
         }
 
         pub fn $fn_new_shrinkable<T, SP>(

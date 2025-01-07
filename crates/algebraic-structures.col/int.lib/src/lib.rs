@@ -6,6 +6,8 @@ use std::cmp;
 use std::fmt::{Debug, Display};
 use std::ops;
 
+//trait A: ops::ShrAssign {}
+
 macro_rules! int_trait {
     ($t:ident $(: $extra_bound0:path $(, $extra_bounds:path)*)? { $($body:tt)* }) => {
         pub trait $t:
@@ -27,6 +29,17 @@ macro_rules! int_trait {
             + ops::MulAssign
             + ops::DivAssign
             + ops::RemAssign
+            + ops::BitAnd<Output = Self>
+            + ops::BitOr<Output = Self>
+            + ops::BitXor<Output = Self>
+            + ops::BitAndAssign
+            + ops::BitOrAssign
+            + ops::BitXorAssign
+            + ops::Shl<usize, Output = Self>
+            + ops::Shr<usize, Output = Self>
+            + ops::ShlAssign<usize>
+            + ops::ShrAssign<usize>
+            + TryFrom<usize>
             + MinExists
             + MaxExists
             + $($extra_bound0 $(+ $extra_bounds)*)?

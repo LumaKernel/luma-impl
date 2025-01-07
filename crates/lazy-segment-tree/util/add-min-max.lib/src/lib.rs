@@ -1,11 +1,8 @@
-use commutative_ring::CommutativeRing;
 use commutative_ring_ord::CommutativeRingOrd;
 use lazy_segment_tree::{lazy_segment_tree_new, LazySegmentTree};
 use lazy_segment_tree_util_type::lazy_seg_type;
 use max_exists::MaxExists;
 use min_exists::MinExists;
-use min_max_count::{MaxCount, MinCount};
-use shrink_provider::{NormalShrink, ShrinkProvider};
 use std::cmp;
 use std::ops;
 use std::rc::Rc;
@@ -13,12 +10,8 @@ use std::rc::Rc;
 macro_rules! f {
     (
         $builder_name:ident,
-        $fn_new_shrinkable:ident,
         $fn_new:ident,
-        $fn_builder_shrinkable:ident,
         $fn_builder:ident,
-        $min_or_max:ident,
-        $min_or_max_count:ident,
         $max_or_min_exists:ident,
         $max_or_min_exists_method:ident,
         $set_max_or_min_exists:ident,
@@ -27,32 +20,28 @@ macro_rules! f {
         $less_or_greater:ident,
         $doc_fn_new:expr $(,)?
     ) => {
-        pub struct $builder_name<T, SP>
+        pub struct $builder_name<T>
         where
             T: Clone,
-            SP: ShrinkProvider + Clone,
         {
             vec: Vec<T>,
             t_add: Option<Box<dyn Fn(&T, &T) -> T>>,
             t_zero: Option<Box<dyn Fn() -> T>>,
             t_ord: Option<Box<dyn Fn(&T, &T) -> cmp::Ordering>>,
             t_max_or_min_exists: Option<Box<dyn Fn() -> T>>,
-            sp: SP,
         }
 
-        impl<T, SP> $builder_name<T, SP>
+        impl<T> $builder_name<T>
         where
             T: Clone,
-            SP: ShrinkProvider + Clone,
         {
-            pub fn new(vec: Vec<T>, sp: SP) -> Self {
+            pub fn new(vec: Vec<T>) -> Self {
                 Self {
                     vec,
                     t_add: None,
                     t_zero: None,
                     t_ord: None,
                     t_max_or_min_exists: None,
-                    sp,
                 }
             }
 
@@ -153,15 +142,7 @@ macro_rules! f {
                 self.$set_max_or_min_exists(|| T::$max_or_min_exists_method())
             }
 
-            pub fn build(
-                self,
-            ) -> lazy_seg_type!(
-                   T = $min_or_max_count<T, SP::USize>,
-                   A = T,
-                   TFolded = $min_or_max_count<T, SP::USize>,
-                   TGetter = T,
-                   TSetter = T,
-               ) {
+            pub fn build(self) -> lazy_seg_type!(T = T, A = T) {
                 self.t_add
                     .as_ref()
                     .or_else(|| panic!("{}: add is not set", stringify!($builder_name)));
@@ -181,110 +162,37 @@ macro_rules! f {
             }
             /// ## Safety
             /// - すべてのメソッドが設定されていること
-            pub unsafe fn build_unchecked(
-                self,
-            ) -> lazy_seg_type!(
-                   T = $min_or_max_count<T, SP::USize>,
-                   A = T,
-                   TFolded = $min_or_max_count<T, SP::USize>,
-                   TGetter = T,
-                   TSetter = T,
-               ) {
+            pub unsafe fn build_unchecked(self) -> lazy_seg_type!(T = T, A = T) {
                 let t_add = Rc::new(unsafe { self.t_add.unwrap_unchecked() });
                 let t_zero = unsafe { self.t_zero.unwrap_unchecked() };
                 let t_max_or_min_exists = unsafe { self.t_max_or_min_exists.unwrap_unchecked() };
                 let t_ord = unsafe { self.t_ord.unwrap_unchecked() };
                 lazy_segment_tree_new(
-                    self.vec
-                        .into_iter()
-                        .enumerate()
-                        .map({
-                            let sp = self.sp.clone();
-                            move |(i, e)| $min_or_max_count {
-                                $min_or_max: e,
-                                count: sp.size_of_shrinked(i),
-                            }
-                        })
-                        .collect(),
-                    move |a: &$min_or_max_count<_, _>, b: &$min_or_max_count<_, _>| match (t_ord)(
-                        &a.$min_or_max,
-                        &b.$min_or_max,
-                    ) {
-                        cmp::Ordering::$greater_or_less => b.clone(),
+                    self.vec,
+                    move |a: &T, b: &T| match (t_ord)(a, b) {
+                        cmp::Ordering::$greater_or_less | cmp::Ordering::Equal => b.clone(),
                         cmp::Ordering::$less_or_greater => a.clone(),
-                        cmp::Ordering::Equal => $min_or_max_count {
-                            $min_or_max: a.$min_or_max.clone(),
-                            count: a.count + b.count,
-                        },
                     },
-                    move || $min_or_max_count {
-                        $min_or_max: t_max_or_min_exists(),
-                        count: SP::USize::zero(),
-                    },
+                    move || t_max_or_min_exists(),
                     {
                         let t_add = t_add.clone();
                         move |x: &T, y: &T| t_add(x, y)
                     },
                     move || t_zero(),
-                    move |x, a| $min_or_max_count {
-                        $min_or_max: t_add(x, &a.$min_or_max),
-                        count: a.count,
-                    },
+                    move |x, a| t_add(x, a),
                 )
-                .set_value_getter(|x, _| x.$min_or_max.clone())
-                .set_value_setter({
-                    let sp = self.sp;
-                    move |x, i| $min_or_max_count {
-                        $min_or_max: x,
-                        count: sp.size_of_shrinked(i),
-                    }
-                })
             }
         }
 
-        pub fn $fn_builder_shrinkable<T, SP>(vec: Vec<T>, sp: SP) -> $builder_name<T, SP>
-        where
-            T: Clone,
-            SP: ShrinkProvider + Clone,
-        {
-            $builder_name::new(vec, sp)
-        }
-
-        pub fn $fn_builder<T>(vec: Vec<T>) -> $builder_name<T, NormalShrink>
+        pub fn $fn_builder<T>(vec: Vec<T>) -> $builder_name<T>
         where
             T: Clone,
         {
-            $builder_name::new(vec, NormalShrink)
-        }
-
-        pub fn $fn_new_shrinkable<T, SP>(
-            vec: Vec<T>,
-            sp: SP,
-        ) -> lazy_seg_type!(
-               T = $min_or_max_count<T, SP::USize>,
-               A = T,
-               TFolded = $min_or_max_count<T, SP::USize>,
-               TGetter = T,
-               TSetter = T,
-           )
-        where
-            T: Clone + CommutativeRingOrd + std::cmp::PartialOrd + $max_or_min_exists,
-            SP: ShrinkProvider + Clone,
-        {
-            let b = $fn_builder_shrinkable(vec, sp).set_all_auto();
-            unsafe { b.build_unchecked() }
+            $builder_name::new(vec)
         }
 
         #[doc = include_str!($doc_fn_new)]
-        pub fn $fn_new<T>(
-            vec: Vec<T>,
-        ) -> lazy_seg_type!(
-               T = $min_or_max_count<T, usize>,
-               A = T,
-               TFolded = $min_or_max_count<T, usize>,
-               TGetter = T,
-               TSetter = T,
-           )
+        pub fn $fn_new<T>(vec: Vec<T>) -> lazy_seg_type!(T = T, A = T)
         where
             T: Clone + CommutativeRingOrd + std::cmp::PartialOrd + $max_or_min_exists,
         {
@@ -295,34 +203,26 @@ macro_rules! f {
 }
 
 f!(
-    LazySegmentTreeAddMinCountBuilder,
-    lazy_segment_tree_new_add_min_count_shrinkable,
-    lazy_segment_tree_new_add_min_count,
-    lazy_segment_tree_builder_add_min_count_shrinkable,
-    lazy_segment_tree_builder_add_min_count,
-    min,
-    MinCount,
+    LazySegmentTreeAddMinBuilder,
+    lazy_segment_tree_new_add_min,
+    lazy_segment_tree_builder_add_min,
     MaxExists,
     max_exists,
     set_max_exists,
     set_max_exists_auto,
     Greater,
     Less,
-    "../doc_new_add_min_count.md",
+    "../doc_new_add_min.md",
 );
 f!(
-    LazySegmentTreeAddMaxCountBuilder,
-    lazy_segment_tree_new_add_max_count_shrinkable,
-    lazy_segment_tree_new_add_max_count,
-    lazy_segment_tree_builder_add_max_count_shrinkable,
-    lazy_segment_tree_builder_add_max_count,
-    max,
-    MaxCount,
+    LazySegmentTreeAddMaxBuilder,
+    lazy_segment_tree_new_add_max,
+    lazy_segment_tree_builder_add_max,
     MinExists,
     min_exists,
     set_min_exists,
     set_min_exists_auto,
     Less,
     Greater,
-    "../doc_new_add_max_count.md",
+    "../doc_new_add_max.md",
 );

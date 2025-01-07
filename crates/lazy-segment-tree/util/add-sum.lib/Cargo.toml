@@ -4,6 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+commutative-ring = { path = "../../../algebraic-structures.col/commutative-ring.lib" }
+commutative-ring-ord = { path = "../../../algebraic-structures.col/commutative-ring-ord.lib" }
 lazy-segment-tree = { path = "../../core.lib" }
 lazy-segment-tree-util-new-with-len = { path = "../new-with-len.lib" }
 lazy-segment-tree-util-type = { path = "../type.lib" }
+monoid = { path = "../../../algebraic-structures.col/monoid.col/monoid.lib" }
+shrink-provider = { path = "../../../shrink/provider.lib" }
