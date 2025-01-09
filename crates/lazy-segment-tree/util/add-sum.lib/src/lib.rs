@@ -1,4 +1,7 @@
-use commutative_ring::{CommutativeRing, MulticativeCommutativeMonoid};
+use commutative_ring::CommutativeRing;
+use commutative_ring_as_additive_group::AdditiveGroup;
+use commutative_ring_as_multicative_commutative_monoid::MulticativeCommutativeMonoid;
+use group_as_monoid::GroupAsMonoid;
 use lazy_segment_tree::LazySegmentTree;
 use lazy_segment_tree_util_new_with_len::lazy_segment_tree_new_with_len_shrinkable;
 use lazy_segment_tree_util_type::lazy_seg_type;
@@ -266,6 +269,42 @@ where
     unsafe { b.build_unchecked() }
 }
 
+pub fn lazy_segment_tree_new_add_sum_com_ring_add<T>(
+    vec: Vec<T>,
+) -> lazy_seg_type!(T = (GroupAsMonoid<AdditiveGroup<T>>, usize), A = GroupAsMonoid<AdditiveGroup<T>>, TFolded = T, TGetter = T, TSetter = T, ASetter = T)
+//) -> lazy_seg_type!(T = (GroupAsMonoid<AdditiveGroup<T>>, usize), A = GroupAsMonoid<AdditiveGroup<T>>, TFolded = AdditiveGroup<T>, TGetter = AdditiveGroup<T>, TSetter = AdditiveGroup<T>, ASetter = AdditiveGroup<T>)
+//) -> lazy_seg_type!(T = (GroupAsMonoid<AdditiveGroup<T>>, usize), A = GroupAsMonoid<AdditiveGroup<T>>, TFolded = GroupAsMonoid<AdditiveGroup<T>>, TGetter = GroupAsMonoid<AdditiveGroup<T>>, TSetter = GroupAsMonoid<AdditiveGroup<T>>, ASetter = GroupAsMonoid<AdditiveGroup<T>>)
+where
+    T: Clone + CommutativeRing + 'static,
+{
+    lazy_segment_tree_new_add_sum_monoid(
+        vec.into_iter()
+            .map(AdditiveGroup)
+            .map(GroupAsMonoid)
+            .collect(),
+    )
+    .map_value_folded_transparent()
+    .map_value_getter_transparent()
+    .map_value_setter_transparent()
+    .map_action_setter_transparent()
+    .map_value_folded_transparent()
+    .map_value_getter_transparent()
+    .map_value_setter_transparent()
+    .map_action_setter_transparent()
+    //.map_value_folded_transparent::<AdditiveGroup<T>>()
+    //.map_value_getter_transparent::<AdditiveGroup<T>>()
+    //.map_value_setter_transparent::<AdditiveGroup<T>>()
+    //.map_action_setter_transparent::<AdditiveGroup<T>>()
+    //.map_value_folded_transparent()
+    //.map_value_getter_transparent()
+    //.map_value_setter_transparent()
+    //.map_action_setter_transparent()
+    //.map_value_folded_transparent()
+    //.map_value_getter_transparent()
+    //.map_value_setter_transparent()
+    //.map_action_setter_transparent()
+}
+
 pub fn lazy_segment_tree_new_add_sum_com_ring_mul<T>(
     vec: Vec<T>,
 ) -> lazy_seg_type!(T = (MulticativeCommutativeMonoid<T>, usize), A = MulticativeCommutativeMonoid<T>, TFolded = T, TGetter = T, TSetter = T, ASetter = T)
@@ -275,10 +314,10 @@ where
     lazy_segment_tree_new_add_sum_monoid(
         vec.into_iter().map(MulticativeCommutativeMonoid).collect(),
     )
-    .map_value_folded_transparent::<MulticativeCommutativeMonoid<T>>()
-    .map_value_getter_transparent::<MulticativeCommutativeMonoid<T>>()
-    .map_value_setter_transparent::<MulticativeCommutativeMonoid<T>>()
-    .map_action_setter_transparent::<MulticativeCommutativeMonoid<T>>()
+    .map_value_folded_transparent()
+    .map_value_getter_transparent()
+    .map_value_setter_transparent()
+    .map_action_setter_transparent()
 }
 
 #[doc = include_str!("../doc_new_add_sum_monoid.md")]

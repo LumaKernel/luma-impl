@@ -1,6 +1,8 @@
-use super::CommutativeRing;
+use commutative_ring::CommutativeRing;
 use group::{Group, QuickGroup, QuickGroupStatic};
 use std::ops;
+use transparent_derive::Transparent;
+use transparent_trait::Transparent;
 
 pub fn quick_group_by_add<T: CommutativeRing>() -> QuickGroupStatic<T> {
     QuickGroup::new(
@@ -14,7 +16,7 @@ pub fn into_additive_group<T: CommutativeRing>(com_ring: T) -> AdditiveGroup<T> 
     AdditiveGroup::from_inner(com_ring)
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Transparent)]
 pub struct AdditiveGroup<T: CommutativeRing>(pub T);
 impl<T: CommutativeRing> AdditiveGroup<T> {
     pub fn into_inner(self) -> T {
@@ -24,12 +26,6 @@ impl<T: CommutativeRing> AdditiveGroup<T> {
         AdditiveGroup(inner)
     }
 }
-impl<T: CommutativeRing> From<T> for AdditiveGroup<T> {
-    fn from(t: T) -> Self {
-        AdditiveGroup(t)
-    }
-}
-
 impl<T: CommutativeRing> Group for AdditiveGroup<T> {
     fn op(&self, other: &Self) -> Self {
         AdditiveGroup(self.0.add(&other.0))

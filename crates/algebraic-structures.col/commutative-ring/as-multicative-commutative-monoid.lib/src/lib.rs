@@ -1,5 +1,5 @@
-use super::CommutativeRing;
 use commutative_monoid::CommutativeMonoid;
+use commutative_ring::CommutativeRing;
 use monoid::Monoid;
 use std::ops;
 use transparent_derive::Transparent;

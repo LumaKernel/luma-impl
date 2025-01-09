@@ -4,4 +4,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-group = { path = "../algebraic-structures.col/group.lib" }
+group = { path = "../algebraic-structures.col/group/core.lib" }

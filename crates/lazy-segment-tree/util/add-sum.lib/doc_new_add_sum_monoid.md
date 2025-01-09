@@ -1,14 +1,8 @@
 遅延セグメントツリー add + sum
 範囲加算(add)と範囲和(sum)
+任意のモノイド上で実現する。
+Binary Exponentiation (二分累乗) を利用して任意のサイズに対しての累積を求める。
 
-```
-use lazy_segment_tree_util_add_sum::lazy_segment_tree_new_add_sum;
-let mut seg = lazy_segment_tree_new_add_sum(vec![1_i32, -1, 5, 3, 2]);
-assert_eq!(seg.fold(..), 10);
-seg.act(3.., 7);
-assert_eq!(seg.fold(..3), 5);
-assert_eq!(seg.fold(..), 24);
-assert_eq!(seg.get(4), 9);
-seg.set(0, 100);
-assert_eq!(seg.fold(..), 123);
-```
+ビルトインの整数型の加算や、modintの加算に関してはBinExpより高速な方法での累積が計算できるため、 `lazy_segment_tree_new_add_sum` を単に代わりに利用すべきだろう。
+
+TODO: 行列による例

@@ -12,6 +12,7 @@ version = "0.1.0"
 dependencies = [
  "access-range",
  "commutative-ring",
+ "commutative-ring-as-additive-group",
  "group",
  "tuple-vec",
 ]
@@ -63,6 +64,25 @@ dependencies = [
  "commutative-monoid",
  "group",
  "monoid",
+]
+
+[[package]]
+name = "commutative-ring-as-additive-group"
+version = "0.1.0"
+dependencies = [
+ "commutative-ring",
+ "group",
+ "transparent-derive",
+ "transparent-trait",
+]
+
+[[package]]
+name = "commutative-ring-as-multicative-commutative-monoid"
+version = "0.1.0"
+dependencies = [
+ "commutative-monoid",
+ "commutative-ring",
+ "monoid",
  "transparent-derive",
  "transparent-trait",
 ]
@@ -88,6 +108,19 @@ dependencies = [
 [[package]]
 name = "group"
 version = "0.1.0"
+dependencies = [
+ "monoid",
+]
+
+[[package]]
+name = "group-as-monoid"
+version = "0.1.0"
+dependencies = [
+ "group",
+ "monoid",
+ "transparent-derive",
+ "transparent-trait",
+]
 
 [[package]]
 name = "int"
@@ -160,7 +193,10 @@ name = "lazy-segment-tree-util-add-sum"
 version = "0.1.0"
 dependencies = [
  "commutative-ring",
+ "commutative-ring-as-additive-group",
+ "commutative-ring-as-multicative-commutative-monoid",
  "commutative-ring-ord",
+ "group-as-monoid",
  "lazy-segment-tree",
  "lazy-segment-tree-util-new-with-len",
  "lazy-segment-tree-util-type",

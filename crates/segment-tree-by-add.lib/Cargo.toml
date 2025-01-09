@@ -5,5 +5,5 @@ edition = "2021"
 
 [dependencies]
 add-monoid = { path = "../algebraic-structures.col/monoid.col/add-monoid.lib" }
-commutative-ring = { path = "../algebraic-structures.col/commutative-ring.lib" }
+commutative-ring = { path = "../algebraic-structures.col/commutative-ring/core.lib" }
 segment-tree = { path = "../segment-tree.lib" }

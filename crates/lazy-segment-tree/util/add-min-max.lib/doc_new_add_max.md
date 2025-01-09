@@ -4,7 +4,6 @@
 ```
 use lazy_segment_tree_util_add_min_max::lazy_segment_tree_new_add_max;
 let mut seg = lazy_segment_tree_new_add_max(vec![1_i32, -1, 5, 3, 2]);
-dbg!("aaa");
 assert_eq!(seg.fold(..), 5);
 seg.act(3.., 5);
 assert_eq!(seg.fold(..3), 5);

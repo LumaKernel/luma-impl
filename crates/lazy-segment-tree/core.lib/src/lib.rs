@@ -285,7 +285,7 @@ where
         }
     }
 
-    pub fn map_value_folded_transparent<TSetter2>(
+    pub fn map_value_folded_transparent(
         self,
     ) -> lazy_seg_type!(
         T = T,
@@ -300,7 +300,7 @@ where
     {
         self.map_value_folded(|x| x.into_inner())
     }
-    pub fn map_value_getter_transparent<TSetter2>(
+    pub fn map_value_getter_transparent(
         self,
     ) -> lazy_seg_type!(
         T = T,
@@ -315,7 +315,7 @@ where
     {
         self.map_value_getter(|x| x.into_inner())
     }
-    pub fn map_value_setter_transparent<TSetter2>(
+    pub fn map_value_setter_transparent(
         self,
     ) -> lazy_seg_type!(
         T = T,
@@ -381,7 +381,7 @@ where
             phantom: Default::default(),
         }
     }
-    pub fn map_action_setter_transparent<ASetter2>(
+    pub fn map_action_setter_transparent(
         self,
     ) -> lazy_seg_type!(
         T = T,
