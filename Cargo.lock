@@ -202,6 +202,7 @@ dependencies = [
  "lazy-segment-tree-util-type",
  "monoid",
  "shrink-provider",
+ "transparent-trait",
 ]
 
 [[package]]

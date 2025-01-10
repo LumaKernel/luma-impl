@@ -3,7 +3,6 @@ use ceil_log2::ceil_log2_usize;
 use lazy_segment_tree_util_type::lazy_seg_type;
 use monoid_action::QuickMonoidAction;
 use std::mem;
-use transparent_trait::Transparent;
 
 pub struct LazySegmentTree<
     TFolded,
@@ -234,9 +233,10 @@ where
             phantom: Default::default(),
         }
     }
+    #[inline]
     pub fn map_value_getter<TGetter2>(
         self,
-        map_fn: impl Fn(TGetter) -> TGetter2,
+        map_fn: impl Fn(TGetter, usize) -> TGetter2,
     ) -> lazy_seg_type!(
         T = T,
         A = A,
@@ -253,12 +253,13 @@ where
             size_pow2: self.size_pow2,
 
             t_into_folded: self.t_into_folded,
-            t_into_getter: move |x, i| map_fn((self.t_into_getter)(x, i)),
+            t_into_getter: move |x, i| map_fn((self.t_into_getter)(x, i), i),
             t_from_setter: self.t_from_setter,
             a_from_setter: self.a_from_setter,
             phantom: Default::default(),
         }
     }
+    #[inline]
     pub fn map_value_setter<TSetter2>(
         self,
         map_fn: impl Fn(TSetter2, usize) -> TSetter,
@@ -285,52 +286,7 @@ where
         }
     }
 
-    pub fn map_value_folded_transparent(
-        self,
-    ) -> lazy_seg_type!(
-        T = T,
-        A = A,
-        TFolded = TFolded::Inner,
-        TGetter = TGetter,
-        TSetter = TSetter,
-        ASetter = ASetter,
-    )
-    where
-        TFolded: Transparent,
-    {
-        self.map_value_folded(|x| x.into_inner())
-    }
-    pub fn map_value_getter_transparent(
-        self,
-    ) -> lazy_seg_type!(
-        T = T,
-        A = A,
-        TFolded = TFolded,
-        TGetter = TGetter::Inner,
-        TSetter = TSetter,
-        ASetter = ASetter,
-    )
-    where
-        TGetter: Transparent,
-    {
-        self.map_value_getter(|x| x.into_inner())
-    }
-    pub fn map_value_setter_transparent(
-        self,
-    ) -> lazy_seg_type!(
-        T = T,
-        A = A,
-        TFolded = TFolded,
-        TGetter = TGetter,
-        TSetter = TSetter::Inner,
-        ASetter = ASetter,
-    )
-    where
-        TSetter: Transparent,
-    {
-        self.map_value_setter(|x, _| TSetter::from_inner(x))
-    }
-
+    #[inline]
     pub fn set_action_setter<ASetter2>(
         self,
         fn_setter: impl Fn(ASetter2) -> A,
@@ -356,6 +312,7 @@ where
             phantom: Default::default(),
         }
     }
+    #[inline]
     pub fn map_action_setter<ASetter2>(
         self,
         map_fn: impl Fn(ASetter2) -> ASetter,
@@ -380,21 +337,6 @@ where
             a_from_setter: move |x| (self.a_from_setter)(map_fn(x)),
             phantom: Default::default(),
         }
-    }
-    pub fn map_action_setter_transparent(
-        self,
-    ) -> lazy_seg_type!(
-        T = T,
-        A = A,
-        TFolded = TFolded,
-        TGetter = TGetter,
-        TSetter = TSetter,
-        ASetter = ASetter::Inner,
-    )
-    where
-        ASetter: Transparent,
-    {
-        self.map_action_setter(|x| ASetter::from_inner(x))
     }
 
     #[inline]

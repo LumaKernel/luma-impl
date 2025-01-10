@@ -14,3 +14,4 @@ lazy-segment-tree-util-new-with-len = { path = "../new-with-len.lib" }
 lazy-segment-tree-util-type = { path = "../type.lib" }
 monoid = { path = "../../../algebraic-structures.col/monoid.col/monoid.lib" }
 shrink-provider = { path = "../../../shrink/provider.lib" }
+transparent-trait = { path = "../../../transparent/trait.lib" }
