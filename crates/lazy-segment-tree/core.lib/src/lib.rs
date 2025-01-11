@@ -1,5 +1,6 @@
 use access_range::IntoAccessRange;
 use ceil_log2::ceil_log2_usize;
+use lazy_segment_tree_util_type::lazy_seg_type;
 use monoid_action::QuickMonoidAction;
 use std::mem;
 
@@ -114,23 +115,14 @@ where
     pub fn set_value_folded<TFolded2>(
         self,
         fn_getter: impl Fn(T) -> TFolded2,
-    ) -> LazySegmentTree<
-        TFolded2,
-        TGetter,
-        TSetter,
-        T,
-        ASetter,
-        A,
-        impl Fn(T) -> TFolded2,
-        TIntoGetter,
-        TFromSetter,
-        AFromSetter,
-        Op,
-        Id,
-        ActOp,
-        ActId,
-        ActApp,
-    > {
+    ) -> lazy_seg_type!(
+        T = T,
+        A = A,
+        TFolded = TFolded2,
+        TGetter = TGetter,
+        TSetter = TSetter,
+        ASetter = ASetter,
+    ) {
         LazySegmentTree {
             monoid_action: self.monoid_action,
             tree: self.tree,
@@ -149,23 +141,14 @@ where
     pub fn set_value_getter<TGetter2>(
         self,
         fn_getter: impl Fn(T, usize) -> TGetter2,
-    ) -> LazySegmentTree<
-        TFolded,
-        TGetter2,
-        TSetter,
-        T,
-        ASetter,
-        A,
-        TIntoFolded,
-        impl Fn(T, usize) -> TGetter2,
-        TFromSetter,
-        AFromSetter,
-        Op,
-        Id,
-        ActOp,
-        ActId,
-        ActApp,
-    > {
+    ) -> lazy_seg_type!(
+        T = T,
+        A = A,
+        TFolded = TFolded,
+        TGetter = TGetter2,
+        TSetter = TSetter,
+        ASetter = ASetter,
+    ) {
         LazySegmentTree {
             monoid_action: self.monoid_action,
             tree: self.tree,
@@ -184,23 +167,14 @@ where
     pub fn set_value_setter<TSetter2>(
         self,
         fn_setter: impl Fn(TSetter2, usize) -> T,
-    ) -> LazySegmentTree<
-        TFolded,
-        TGetter,
-        TSetter2,
-        T,
-        ASetter,
-        A,
-        TIntoFolded,
-        TIntoGetter,
-        impl Fn(TSetter2, usize) -> T,
-        AFromSetter,
-        Op,
-        Id,
-        ActOp,
-        ActId,
-        ActApp,
-    > {
+    ) -> lazy_seg_type!(
+        T = T,
+        A = A,
+        TFolded = TFolded,
+        TGetter = TGetter,
+        TSetter = TSetter2,
+        ASetter = ASetter,
+    ) {
         LazySegmentTree {
             monoid_action: self.monoid_action,
             tree: self.tree,
@@ -216,26 +190,96 @@ where
         }
     }
 
+    pub fn map_value_folded<TFolded2>(
+        self,
+        map_fn: impl Fn(TFolded) -> TFolded2,
+    ) -> lazy_seg_type!(
+        T = T,
+        A = A,
+        TFolded = TFolded2,
+        TGetter = TGetter,
+        TSetter = TSetter,
+        ASetter = ASetter,
+    ) {
+        LazySegmentTree {
+            monoid_action: self.monoid_action,
+            tree: self.tree,
+            lazy: self.lazy,
+            size: self.size,
+            size_pow2: self.size_pow2,
+
+            t_into_folded: move |x| map_fn((self.t_into_folded)(x)),
+            t_into_getter: self.t_into_getter,
+            t_from_setter: self.t_from_setter,
+            a_from_setter: self.a_from_setter,
+            phantom: Default::default(),
+        }
+    }
+    #[inline]
+    pub fn map_value_getter<TGetter2>(
+        self,
+        map_fn: impl Fn(TGetter, usize) -> TGetter2,
+    ) -> lazy_seg_type!(
+        T = T,
+        A = A,
+        TFolded = TFolded,
+        TGetter = TGetter2,
+        TSetter = TSetter,
+        ASetter = ASetter,
+    ) {
+        LazySegmentTree {
+            monoid_action: self.monoid_action,
+            tree: self.tree,
+            lazy: self.lazy,
+            size: self.size,
+            size_pow2: self.size_pow2,
+
+            t_into_folded: self.t_into_folded,
+            t_into_getter: move |x, i| map_fn((self.t_into_getter)(x, i), i),
+            t_from_setter: self.t_from_setter,
+            a_from_setter: self.a_from_setter,
+            phantom: Default::default(),
+        }
+    }
+    #[inline]
+    pub fn map_value_setter<TSetter2>(
+        self,
+        map_fn: impl Fn(TSetter2, usize) -> TSetter,
+    ) -> lazy_seg_type!(
+        T = T,
+        A = A,
+        TFolded = TFolded,
+        TGetter = TGetter,
+        TSetter = TSetter2,
+        ASetter = ASetter,
+    ) {
+        LazySegmentTree {
+            monoid_action: self.monoid_action,
+            tree: self.tree,
+            lazy: self.lazy,
+            size: self.size,
+            size_pow2: self.size_pow2,
+
+            t_into_folded: self.t_into_folded,
+            t_into_getter: self.t_into_getter,
+            t_from_setter: move |x, i| (self.t_from_setter)(map_fn(x, i), i),
+            a_from_setter: self.a_from_setter,
+            phantom: Default::default(),
+        }
+    }
+
+    #[inline]
     pub fn set_action_setter<ASetter2>(
         self,
         fn_setter: impl Fn(ASetter2) -> A,
-    ) -> LazySegmentTree<
-        TFolded,
-        TGetter,
-        TSetter,
-        T,
-        ASetter2,
-        A,
-        TIntoFolded,
-        TIntoGetter,
-        TFromSetter,
-        impl Fn(ASetter2) -> A,
-        Op,
-        Id,
-        ActOp,
-        ActId,
-        ActApp,
-    > {
+    ) -> lazy_seg_type!(
+        T = T,
+        A = A,
+        TFolded = TFolded,
+        TGetter = TGetter,
+        TSetter = TSetter,
+        ASetter = ASetter2,
+    ) {
         LazySegmentTree {
             monoid_action: self.monoid_action,
             tree: self.tree,
@@ -247,6 +291,32 @@ where
             t_into_getter: self.t_into_getter,
             t_from_setter: self.t_from_setter,
             a_from_setter: fn_setter,
+            phantom: Default::default(),
+        }
+    }
+    #[inline]
+    pub fn map_action_setter<ASetter2>(
+        self,
+        map_fn: impl Fn(ASetter2) -> ASetter,
+    ) -> lazy_seg_type!(
+        T = T,
+        A = A,
+        TFolded = TFolded,
+        TGetter = TGetter,
+        TSetter = TSetter,
+        ASetter = ASetter2,
+    ) {
+        LazySegmentTree {
+            monoid_action: self.monoid_action,
+            tree: self.tree,
+            lazy: self.lazy,
+            size: self.size,
+            size_pow2: self.size_pow2,
+
+            t_into_folded: self.t_into_folded,
+            t_into_getter: self.t_into_getter,
+            t_from_setter: self.t_from_setter,
+            a_from_setter: move |x| (self.a_from_setter)(map_fn(x)),
             phantom: Default::default(),
         }
     }
@@ -470,23 +540,7 @@ pub fn lazy_segment_tree_new<T, A, Op, Id, ActOp, ActId, ActApp>(
     act_op: ActOp,
     act_id: ActId,
     act_app: ActApp,
-) -> LazySegmentTree<
-    T,
-    T,
-    T,
-    T,
-    A,
-    A,
-    impl Fn(T) -> T,
-    impl Fn(T, usize) -> T,
-    impl Fn(T, usize) -> T,
-    impl Fn(A) -> A,
-    Op,
-    Id,
-    ActOp,
-    ActId,
-    ActApp,
->
+) -> lazy_seg_type!(T = T, A = A)
 where
     Op: Fn(&T, &T) -> T,
     Id: Fn() -> T,

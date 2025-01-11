@@ -27,6 +27,17 @@ macro_rules! int_trait {
             + ops::MulAssign
             + ops::DivAssign
             + ops::RemAssign
+            + ops::BitAnd<Output = Self>
+            + ops::BitOr<Output = Self>
+            + ops::BitXor<Output = Self>
+            + ops::BitAndAssign
+            + ops::BitOrAssign
+            + ops::BitXorAssign
+            + ops::Shl<usize, Output = Self>
+            + ops::Shr<usize, Output = Self>
+            + ops::ShlAssign<usize>
+            + ops::ShrAssign<usize>
+            + TryFrom<usize>
             + MinExists
             + MaxExists
             + $($extra_bound0 $(+ $extra_bounds)*)?

@@ -55,7 +55,7 @@ where
     .set_add(|a, b| <TU as CommutativeRing>::add(a, b))
     .set_zero_by_default()
     .set_max_exists_auto()
-    .set_partial_ord_auto();
+    .set_ord_auto();
     let mut seg = unsafe { seg.build_unchecked() };
     let mut last_y = None;
     for chunk in events.chunk_by(|a, b| a.1 == b.1) {

@@ -1,5 +1,3 @@
-use super::{into_additive_group, AdditiveGroup};
-
 /// CommutativeRing:
 ///   Definitions:
 ///     Let a+b := add(a, b)
@@ -24,11 +22,4 @@ pub trait CommutativeRing {
     fn neg(&self) -> Self;
     fn zero() -> Self;
     fn one() -> Self;
-
-    fn into_additive_group(self) -> AdditiveGroup<Self>
-    where
-        Self: Sized,
-    {
-        into_additive_group(self)
-    }
 }

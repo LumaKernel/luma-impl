@@ -1,5 +1,6 @@
 use access_range::IntoAccessRange;
-use commutative_ring::{quick_group_by_add, CommutativeRing};
+use commutative_ring::CommutativeRing;
+use commutative_ring_as_additive_group::quick_group_by_add;
 use group::{group_to_quick, Group, QuickGroup};
 
 pub struct Accumulated<T, U, Op, Inv, Id, ToReturn>

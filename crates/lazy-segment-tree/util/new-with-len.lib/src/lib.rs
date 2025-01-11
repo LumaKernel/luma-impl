@@ -1,7 +1,7 @@
 use commutative_ring::CommutativeRing;
 use lazy_segment_tree::{lazy_segment_tree_new, LazySegmentTree};
 use lazy_segment_tree_util_type::lazy_seg_type;
-use shrink_provider::{NormalShrink, ShrinkProvider};
+use shrink_provider::{NoShrink, ShrinkProvider};
 
 pub fn lazy_segment_tree_new_with_len_shrinkable<T, A, Op, Id, ActOp, ActId, ActAppWithLen, SP>(
     vec: Vec<T>,
@@ -67,6 +67,9 @@ where
         act_op,
         act_id,
         act_app_with_len,
-        NormalShrink,
+        NoShrink,
     )
 }
+
+#[cfg(test)]
+mod test;

@@ -2,6 +2,3 @@
 name = "commutative-ring"
 version = "0.1.0"
 edition = "2021"
-
-[dependencies]
-group = { path = "../group.lib" }

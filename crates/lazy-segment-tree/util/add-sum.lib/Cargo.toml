@@ -4,6 +4,14 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+commutative-ring = { path = "../../../algebraic-structures.col/commutative-ring/core.lib" }
+commutative-ring-as-additive-group = { path = "../../../algebraic-structures.col/commutative-ring/as-additive-group.lib" }
+commutative-ring-as-multicative-commutative-monoid = { path = "../../../algebraic-structures.col/commutative-ring/as-multicative-commutative-monoid.lib" }
+commutative-ring-ord = { path = "../../../algebraic-structures.col/commutative-ring-ord.lib" }
+group-as-monoid = { path = "../../../algebraic-structures.col/group/as-monoid.lib" }
 lazy-segment-tree = { path = "../../core.lib" }
 lazy-segment-tree-util-new-with-len = { path = "../new-with-len.lib" }
 lazy-segment-tree-util-type = { path = "../type.lib" }
+monoid = { path = "../../../algebraic-structures.col/monoid.col/monoid.lib" }
+shrink-provider = { path = "../../../shrink/provider.lib" }
+transparent-trait = { path = "../../../transparent/trait.lib" }

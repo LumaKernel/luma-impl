@@ -6,8 +6,8 @@ pub trait ShrinkProvider {
     fn size_of_shrinked(&self, index: usize) -> Self::USize;
 }
 #[derive(Clone, Copy, Debug, Default)]
-pub struct NormalShrink;
-impl ShrinkProvider for NormalShrink {
+pub struct NoShrink;
+impl ShrinkProvider for NoShrink {
     type USize = usize;
     #[inline(always)]
     fn size_of_shrinked(&self, _index: usize) -> usize {
