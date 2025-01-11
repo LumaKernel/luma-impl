@@ -8,6 +8,3 @@ access-range = { path = "../access-range.lib" }
 commutative-ring = { path = "../algebraic-structures.col/commutative-ring/core.lib" }
 commutative-ring-as-additive-group = { path = "../algebraic-structures.col/commutative-ring/as-additive-group.lib" }
 group = { path = "../algebraic-structures.col/group/core.lib" }
-
-[dev-dependencies]
-tuple-vec = { path = "../tuple-vec.lib" }

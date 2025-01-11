@@ -2,8 +2,3 @@
 name = "commutative-ring"
 version = "0.1.0"
 edition = "2021"
-
-[dependencies]
-commutative-monoid = { path = "../../monoid.col/commutative-monoid.lib" }
-group = { path = "../../group/core.lib" }
-monoid = { path = "../../monoid.col/monoid.lib" }

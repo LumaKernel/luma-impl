@@ -1,9 +1,0 @@
-[package]
-name = "lazy-segment-tree-util-set-sum-general"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-lazy-segment-tree = { path = "../../core.lib" }
-lazy-segment-tree-util-new-with-len = { path = "../new-with-len.lib" }
-lazy-segment-tree-util-type = { path = "../type.lib" }

@@ -14,7 +14,6 @@ dependencies = [
  "commutative-ring",
  "commutative-ring-as-additive-group",
  "group",
- "tuple-vec",
 ]
 
 [[package]]
@@ -60,11 +59,6 @@ dependencies = [
 [[package]]
 name = "commutative-ring"
 version = "0.1.0"
-dependencies = [
- "commutative-monoid",
- "group",
- "monoid",
-]
 
 [[package]]
 name = "commutative-ring-as-additive-group"
@@ -108,9 +102,6 @@ dependencies = [
 [[package]]
 name = "group"
 version = "0.1.0"
-dependencies = [
- "monoid",
-]
 
 [[package]]
 name = "group-as-monoid"
@@ -143,7 +134,6 @@ dependencies = [
  "monoid-action",
  "rand",
  "rand_xoshiro",
- "transparent-trait",
 ]
 
 [[package]]
@@ -159,7 +149,6 @@ dependencies = [
  "lazy-segment-tree-util-set-min-max",
  "lazy-segment-tree-util-set-min-max-count",
  "lazy-segment-tree-util-set-sum",
- "lazy-segment-tree-util-set-sum-general",
  "lazy-segment-tree-util-type",
 ]
 
@@ -251,18 +240,17 @@ dependencies = [
 name = "lazy-segment-tree-util-set-sum"
 version = "0.1.0"
 dependencies = [
+ "commutative-ring",
+ "commutative-ring-as-additive-group",
+ "commutative-ring-as-multicative-commutative-monoid",
+ "commutative-ring-ord",
+ "group-as-monoid",
  "lazy-segment-tree",
  "lazy-segment-tree-util-new-with-len",
  "lazy-segment-tree-util-type",
-]
-
-[[package]]
-name = "lazy-segment-tree-util-set-sum-general"
-version = "0.1.0"
-dependencies = [
- "lazy-segment-tree",
- "lazy-segment-tree-util-new-with-len",
- "lazy-segment-tree-util-type",
+ "monoid",
+ "shrink-provider",
+ "transparent-trait",
 ]
 
 [[package]]
@@ -479,19 +467,11 @@ version = "0.1.0"
 dependencies = [
  "quote",
  "syn",
- "transparent-trait",
 ]
 
 [[package]]
 name = "transparent-trait"
 version = "0.1.0"
-
-[[package]]
-name = "tuple-vec"
-version = "0.1.0"
-dependencies = [
- "group",
-]
 
 [[package]]
 name = "unicode-ident"

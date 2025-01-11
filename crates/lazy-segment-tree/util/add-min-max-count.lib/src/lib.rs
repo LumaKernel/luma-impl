@@ -5,7 +5,7 @@ use lazy_segment_tree_util_type::lazy_seg_type;
 use max_exists::MaxExists;
 use min_exists::MinExists;
 use min_max_count::{MaxCount, MinCount};
-use shrink_provider::{NormalShrink, ShrinkProvider};
+use shrink_provider::{NoShrink, ShrinkProvider};
 use std::cmp;
 use std::ops;
 use std::rc::Rc;
@@ -250,11 +250,11 @@ macro_rules! f {
             $builder_name::new(vec, sp)
         }
 
-        pub fn $fn_builder<T>(vec: Vec<T>) -> $builder_name<T, NormalShrink>
+        pub fn $fn_builder<T>(vec: Vec<T>) -> $builder_name<T, NoShrink>
         where
             T: Clone,
         {
-            $builder_name::new(vec, NormalShrink)
+            $builder_name::new(vec, NoShrink)
         }
 
         pub fn $fn_new_shrinkable<T, SP>(

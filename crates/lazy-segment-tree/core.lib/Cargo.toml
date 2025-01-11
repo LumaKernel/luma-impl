@@ -8,7 +8,6 @@ access-range = { path = "../../access-range.lib" }
 ceil-log2 = { path = "../../ceil-log2.lib" }
 lazy-segment-tree-util-type = { path = "../util/type.lib" }
 monoid-action = { path = "../../algebraic-structures.col/monoid.col/monoid-action.lib" }
-transparent-trait = { path = "../../transparent/trait.lib" }
 
 [dev-dependencies]
 lazy-segment-tree-util-new-with-len = { path = "../util/new-with-len.lib" }

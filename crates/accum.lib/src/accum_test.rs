@@ -1,7 +1,5 @@
 #![allow(clippy::reversed_empty_ranges)]
-use crate::{accum, accum_by, accum_by_add};
-use commutative_ring::CommutativeRing;
-use tuple_vec::TupleVec2;
+use crate::{accum_by, accum_by_add};
 
 #[test]
 fn test_accum() {
@@ -46,26 +44,6 @@ fn test_accum_by() {
         |a| (-a.0, -a.1),
         || (0, 0),
     );
-    assert_eq!(a.fold(0..=0), (1, 4));
-    assert_eq!(a.fold(0..=1), (-2, 8));
-    assert_eq!(a.fold(1..=1), (-3, 4));
-    assert_eq!(a.fold(3..=3), (-4, 4));
-    assert_eq!(a.fold(2..=3), (-1, 13));
-    assert_eq!(a.fold(0..=3), (-3, 21));
-    assert_eq!(a.fold(0..0), (0, 0));
-}
-
-#[test]
-fn test_accum_with_tuple_vec() {
-    let v: Vec<(i32, i32)> = vec![(1, 4), (-3, 4), (3, 9), (-4, 4)];
-    let a = accum(
-        v.into_iter()
-            .map(|(a, b)| (a.into_additive_group(), b.into_additive_group()))
-            .map(TupleVec2::from)
-            .collect(),
-    )
-    .map_return(|e| e.into_tuple())
-    .map_return(|(a, b)| (a.into_inner(), b.into_inner()));
     assert_eq!(a.fold(0..=0), (1, 4));
     assert_eq!(a.fold(0..=1), (-2, 8));
     assert_eq!(a.fold(1..=1), (-3, 4));

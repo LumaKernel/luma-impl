@@ -13,5 +13,4 @@ lazy-segment-tree-util-new-with-range = { path = "../util/new-with-range.lib" }
 lazy-segment-tree-util-set-min-max = { path = "../util/set-min-max.lib" }
 lazy-segment-tree-util-set-min-max-count = { path = "../util/set-min-max-count.lib" }
 lazy-segment-tree-util-set-sum = { path = "../util/set-sum.lib" }
-lazy-segment-tree-util-set-sum-general = { path = "../util/set-sum-general.lib" }
 lazy-segment-tree-util-type = { path = "../util/type.lib" }
