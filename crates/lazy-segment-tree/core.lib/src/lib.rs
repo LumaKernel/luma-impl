@@ -115,23 +115,14 @@ where
     pub fn set_value_folded<TFolded2>(
         self,
         fn_getter: impl Fn(T) -> TFolded2,
-    ) -> LazySegmentTree<
-        TFolded2,
-        TGetter,
-        TSetter,
-        T,
-        ASetter,
-        A,
-        impl Fn(T) -> TFolded2,
-        TIntoGetter,
-        TFromSetter,
-        AFromSetter,
-        Op,
-        Id,
-        ActOp,
-        ActId,
-        ActApp,
-    > {
+    ) -> lazy_seg_type!(
+        T = T,
+        A = A,
+        TFolded = TFolded2,
+        TGetter = TGetter,
+        TSetter = TSetter,
+        ASetter = ASetter,
+    ) {
         LazySegmentTree {
             monoid_action: self.monoid_action,
             tree: self.tree,
@@ -150,23 +141,14 @@ where
     pub fn set_value_getter<TGetter2>(
         self,
         fn_getter: impl Fn(T, usize) -> TGetter2,
-    ) -> LazySegmentTree<
-        TFolded,
-        TGetter2,
-        TSetter,
-        T,
-        ASetter,
-        A,
-        TIntoFolded,
-        impl Fn(T, usize) -> TGetter2,
-        TFromSetter,
-        AFromSetter,
-        Op,
-        Id,
-        ActOp,
-        ActId,
-        ActApp,
-    > {
+    ) -> lazy_seg_type!(
+        T = T,
+        A = A,
+        TFolded = TFolded,
+        TGetter = TGetter2,
+        TSetter = TSetter,
+        ASetter = ASetter,
+    ) {
         LazySegmentTree {
             monoid_action: self.monoid_action,
             tree: self.tree,
@@ -558,23 +540,7 @@ pub fn lazy_segment_tree_new<T, A, Op, Id, ActOp, ActId, ActApp>(
     act_op: ActOp,
     act_id: ActId,
     act_app: ActApp,
-) -> LazySegmentTree<
-    T,
-    T,
-    T,
-    T,
-    A,
-    A,
-    impl Fn(T) -> T,
-    impl Fn(T, usize) -> T,
-    impl Fn(T, usize) -> T,
-    impl Fn(A) -> A,
-    Op,
-    Id,
-    ActOp,
-    ActId,
-    ActApp,
->
+) -> lazy_seg_type!(T = T, A = A)
 where
     Op: Fn(&T, &T) -> T,
     Id: Fn() -> T,

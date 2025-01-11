@@ -6,8 +6,6 @@ use std::cmp;
 use std::fmt::{Debug, Display};
 use std::ops;
 
-//trait A: ops::ShrAssign {}
-
 macro_rules! int_trait {
     ($t:ident $(: $extra_bound0:path $(, $extra_bounds:path)*)? { $($body:tt)* }) => {
         pub trait $t:
