@@ -1,6 +1,7 @@
 use int::{Int, UnsignedInt};
 use shrink_provider::ShrinkProvider;
-use std::{fmt::Debug, ops::Bound, rc::Rc};
+use std::ops::Range;
+use std::{fmt::Debug, rc::Rc};
 
 /// Indexからusizeへの座標圧縮を提供する
 #[derive(Clone, Debug)]
@@ -19,13 +20,10 @@ where
     USize: UnsignedInt,
     Index: Int<UnsignedIntSameSize = USize>,
 {
+    #[inline(always)]
     fn default() -> Self {
         Self { points: Vec::new() }
     }
-}
-pub enum Unshrinked<Index> {
-    Point(Index),
-    Space(Bound<Index>, Bound<Index>),
 }
 impl<USize, Index> Shrink<USize, Index>
 where
@@ -35,14 +33,17 @@ where
     /// ## Panic-free Preconditions
     /// - `i` は対象座標の最小値と最大値の間
     ///   - 任意の値を対象にしたければ ::MIN ::MAX を事前に加えておくという方法が考えられる
+    #[inline]
     pub fn shrink(&self, i: &Index) -> usize {
         assert!(i >= &self.shrinkable_min());
         assert!(i <= &self.shrinkable_max());
         unsafe { self.shrink_unchecked(i) }
     }
+
     /// ## Safety
     /// - `i` は対象座標の最小値と最大値の間
     ///   - 任意の値を対象にしたければ ::MIN ::MAX を事前に加えておくという方法が考えられる
+    #[inline]
     pub unsafe fn shrink_unchecked(&self, i: &Index) -> usize {
         debug_assert!(i >= &self.shrinkable_min());
         debug_assert!(i <= &self.shrinkable_max());
@@ -51,36 +52,54 @@ where
             Err(s) => s,
         }
     }
-    pub fn unshrink(&self, _i: usize) -> Unshrinked<Index> {
-        todo!("unshrink");
+
+    /// ## Panic-free Preconditions
+    /// - `i` は圧縮された座標の範囲内 ( `0 <= i < self.shrinked_len()` )
+    #[inline]
+    pub fn unshrink(&self, i: usize) -> Range<Index> {
+        if i == 0 {
+            return self.shrinkable_min()..self.shrinkable_min() + Index::one();
+        }
+        self.points[i - 1] + Index::one()..self.points[i] + Index::one()
     }
+
+    #[inline]
     pub fn size_of_shrinked(&self, i: usize) -> USize {
         if i == 0 {
             return USize::one();
         }
         (self.points[i] - self.points[i - 1]).to_same_size_unsigned_int()
     }
+
+    #[inline(always)]
     pub fn shrinkable_min(&self) -> Index {
         self.points[0]
     }
+
+    #[inline(always)]
     pub fn shrinkable_max(&self) -> Index {
         *self.points.last().unwrap()
     }
+
+    #[inline(always)]
     pub fn shrinked_len(&self) -> usize {
         self.points.len()
     }
 }
+
 impl<USize, Index> ShrinkProvider for Shrink<USize, Index>
 where
     USize: UnsignedInt,
     Index: Int<UnsignedIntSameSize = USize>,
 {
     type USize = USize;
+    #[inline(always)]
     fn size_of_shrinked(&self, index: usize) -> Self::USize {
         self.size_of_shrinked(index)
     }
 }
 
+#[inline]
 pub fn shrink<USize, Index>(mut v: Vec<Index>) -> Rc<Shrink<USize, Index>>
 where
     USize: UnsignedInt,
