@@ -405,20 +405,24 @@ dependencies = [
  "monoid",
  "rand",
  "rand_xoshiro",
+ "segment-tree-util-type",
  "transparent-trait",
 ]
 
 [[package]]
-name = "segment-tree-by-add"
+name = "segment-tree-util-add"
 version = "0.1.0"
 dependencies = [
  "add-monoid",
  "commutative-ring",
+ "monoid",
  "segment-tree",
+ "segment-tree-util-type",
+ "shrink-provider",
 ]
 
 [[package]]
-name = "segment-tree-by-max"
+name = "segment-tree-util-max"
 version = "0.1.0"
 dependencies = [
  "max-monoid",
@@ -427,13 +431,27 @@ dependencies = [
 ]
 
 [[package]]
-name = "segment-tree-by-min"
+name = "segment-tree-util-min"
 version = "0.1.0"
 dependencies = [
  "max-exists",
  "min-monoid",
  "segment-tree",
 ]
+
+[[package]]
+name = "segment-tree-util-new-with-len"
+version = "0.1.0"
+dependencies = [
+ "commutative-ring",
+ "segment-tree",
+ "segment-tree-util-type",
+ "shrink-provider",
+]
+
+[[package]]
+name = "segment-tree-util-type"
+version = "0.1.0"
 
 [[package]]
 name = "shrink"

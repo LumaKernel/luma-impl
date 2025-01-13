@@ -1,9 +1,14 @@
 use commutative_ring::CommutativeRing;
-use lazy_segment_tree::{lazy_segment_tree_new, LazySegmentTree};
-use lazy_segment_tree_util_type::lazy_seg_type;
+use segment_tree::{segment_tree_new, LazySegmentTree};
+use segment_tree_util_type::seg_type;
 use shrink_provider::{NoShrink, ShrinkProvider};
 
-pub fn lazy_segment_tree_new_with_len_shrinkable<T, A, Op, Id, ActOp, ActId, ActAppWithLen, SP>(
+pub struct WithSize<T, USize> {
+    value: T,
+    size: USize,
+}
+
+pub fn segment_tree_new_with_len_shrinkable<T, A, Op, Id, ActOp, ActId, ActAppWithLen, SP>(
     vec: Vec<T>,
     op: Op,
     id: Id,
@@ -11,13 +16,13 @@ pub fn lazy_segment_tree_new_with_len_shrinkable<T, A, Op, Id, ActOp, ActId, Act
     act_id: ActId,
     act_app_with_len: ActAppWithLen,
     sp: SP,
-) -> lazy_seg_type!(
-    T = (T, SP::USize),
-    TFolded = T,
-    TGetter = T,
-    TSetter = T,
-    A = A,
-)
+) -> seg_type!(
+       T = WithSize<T, SP::USize>,
+       TFolded = T,
+       TFoldedInspect = WithSize<T, SP::USize>,
+       TGetter = T,
+       TSetter = T,
+   )
 where
     Op: Fn(&T, &T) -> T,
     Id: Fn() -> T,
@@ -26,7 +31,7 @@ where
     ActAppWithLen: Fn(&A, &T, SP::USize) -> T,
     SP: ShrinkProvider + Clone,
 {
-    lazy_segment_tree_new(
+    segment_tree_new(
         vec.into_iter()
             .enumerate()
             .map({
@@ -36,23 +41,26 @@ where
             .collect::<Vec<_>>(),
         move |(a, a_size), (b, b_size)| ((op)(a, b), *a_size + *b_size),
         move || ((id)(), SP::USize::zero()),
-        act_op,
-        act_id,
-        move |a, (t, t_size)| (act_app_with_len(a, t, *t_size), *t_size),
     )
     .set_value_folded(|(t, _)| t)
     .set_value_getter(|(t, _), _| t)
     .set_value_setter(move |t, i| (t, sp.size_of_shrinked(i)))
 }
 
-pub fn lazy_segment_tree_new_with_len<T, A, Op, Id, ActOp, ActId, ActAppWithLen>(
+pub fn segment_tree_new_with_len<T, A, Op, Id, ActOp, ActId, ActAppWithLen>(
     vec: Vec<T>,
     op: Op,
     id: Id,
     act_op: ActOp,
     act_id: ActId,
     act_app_with_len: ActAppWithLen,
-) -> lazy_seg_type!(T = (T, usize), TFolded = T, TGetter = T, TSetter = T, A = A)
+) -> seg_type!(
+    T = (T, usize),
+    TFolded = T,
+    TFoldedInspect = (T, usize),
+    TGetter = T,
+    TSetter = T,
+)
 where
     Op: Fn(&T, &T) -> T,
     Id: Fn() -> T,
@@ -60,15 +68,7 @@ where
     ActId: Fn() -> A,
     ActAppWithLen: Fn(&A, &T, usize) -> T,
 {
-    lazy_segment_tree_new_with_len_shrinkable(
-        vec,
-        op,
-        id,
-        act_op,
-        act_id,
-        act_app_with_len,
-        NoShrink,
-    )
+    segment_tree_new_with_len_shrinkable(vec, op, id, act_op, act_id, act_app_with_len, NoShrink)
 }
 
 #[cfg(test)]

@@ -157,10 +157,10 @@ macro_rules! f {
                 self,
             ) -> lazy_seg_type!(
                    T = $min_or_max_count<T, SP::USize>,
-                   A = T,
                    TFolded = $min_or_max_count<T, SP::USize>,
                    TGetter = T,
                    TSetter = T,
+                   A = T,
                ) {
                 self.t_add
                     .as_ref()
@@ -185,10 +185,10 @@ macro_rules! f {
                 self,
             ) -> lazy_seg_type!(
                    T = $min_or_max_count<T, SP::USize>,
-                   A = T,
                    TFolded = $min_or_max_count<T, SP::USize>,
                    TGetter = T,
                    TSetter = T,
+                   A = T,
                ) {
                 let t_add = Rc::new(unsafe { self.t_add.unwrap_unchecked() });
                 let t_zero = unsafe { self.t_zero.unwrap_unchecked() };
@@ -262,10 +262,10 @@ macro_rules! f {
             sp: SP,
         ) -> lazy_seg_type!(
                T = $min_or_max_count<T, SP::USize>,
-               A = T,
                TFolded = $min_or_max_count<T, SP::USize>,
                TGetter = T,
                TSetter = T,
+               A = T,
            )
         where
             T: Clone + CommutativeRingOrd + std::cmp::PartialOrd + $max_or_min_exists,
@@ -280,10 +280,10 @@ macro_rules! f {
             vec: Vec<T>,
         ) -> lazy_seg_type!(
                T = $min_or_max_count<T, usize>,
-               A = T,
                TFolded = $min_or_max_count<T, usize>,
                TGetter = T,
                TSetter = T,
+               A = T,
            )
         where
             T: Clone + CommutativeRingOrd + std::cmp::PartialOrd + $max_or_min_exists,

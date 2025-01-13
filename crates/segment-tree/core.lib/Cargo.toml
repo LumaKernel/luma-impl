@@ -1,0 +1,19 @@
+[package]
+name = "segment-tree"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+access-range = { path = "../../access-range.lib" }
+ceil-log2 = { path = "../../ceil-log2.lib" }
+monoid = { path = "../../algebraic-structures.col/monoid.col/monoid.lib" }
+segment-tree-util-type = { path = "../util/type.lib" }
+transparent-trait = { path = "../../transparent/trait.lib" }
+
+[dev-dependencies]
+add-monoid = { path = "../../algebraic-structures.col/monoid.col/add-monoid.lib" }
+
+max-monoid = { path = "../../algebraic-structures.col/monoid.col/max-monoid.lib" }
+min-monoid = { path = "../../algebraic-structures.col/monoid.col/min-monoid.lib" }
+rand = "0.8.5"
+rand_xoshiro = "0.6.0"

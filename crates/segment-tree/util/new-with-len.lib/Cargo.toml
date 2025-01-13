@@ -1,0 +1,10 @@
+[package]
+name = "segment-tree-util-new-with-len"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+commutative-ring = { path = "../../../algebraic-structures.col/commutative-ring/core.lib" }
+segment-tree = { path = "../../core.lib" }
+segment-tree-util-type = { path = "../type.lib" }
+shrink-provider = { path = "../../../shrink/provider.lib" }

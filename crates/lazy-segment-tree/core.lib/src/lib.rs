@@ -5,12 +5,12 @@ use monoid_action::QuickMonoidAction;
 use std::mem;
 
 pub struct LazySegmentTree<
+    T,
     TFolded,
     TGetter,
     TSetter,
-    T,
-    ASetter,
     A,
+    ASetter,
     TIntoFolded,
     TIntoGetter,
     TFromSetter,
@@ -46,12 +46,12 @@ pub struct LazySegmentTree<
 }
 
 impl<
+        T,
         TFolded,
         TGetter,
         TSetter,
-        T,
-        ASetter,
         A,
+        ASetter,
         TIntoFolded,
         TIntoGetter,
         TFromSetter,
@@ -63,12 +63,12 @@ impl<
         ActApp,
     >
     LazySegmentTree<
+        T,
         TFolded,
         TGetter,
         TSetter,
-        T,
-        ASetter,
         A,
+        ASetter,
         TIntoFolded,
         TIntoGetter,
         TFromSetter,
@@ -117,10 +117,10 @@ where
         fn_getter: impl Fn(T) -> TFolded2,
     ) -> lazy_seg_type!(
         T = T,
-        A = A,
         TFolded = TFolded2,
         TGetter = TGetter,
         TSetter = TSetter,
+        A = A,
         ASetter = ASetter,
     ) {
         LazySegmentTree {
@@ -143,10 +143,10 @@ where
         fn_getter: impl Fn(T, usize) -> TGetter2,
     ) -> lazy_seg_type!(
         T = T,
-        A = A,
         TFolded = TFolded,
         TGetter = TGetter2,
         TSetter = TSetter,
+        A = A,
         ASetter = ASetter,
     ) {
         LazySegmentTree {
@@ -169,10 +169,10 @@ where
         fn_setter: impl Fn(TSetter2, usize) -> T,
     ) -> lazy_seg_type!(
         T = T,
-        A = A,
         TFolded = TFolded,
         TGetter = TGetter,
         TSetter = TSetter2,
+        A = A,
         ASetter = ASetter,
     ) {
         LazySegmentTree {
@@ -195,10 +195,10 @@ where
         map_fn: impl Fn(TFolded) -> TFolded2,
     ) -> lazy_seg_type!(
         T = T,
-        A = A,
         TFolded = TFolded2,
         TGetter = TGetter,
         TSetter = TSetter,
+        A = A,
         ASetter = ASetter,
     ) {
         LazySegmentTree {
@@ -221,10 +221,10 @@ where
         map_fn: impl Fn(TGetter, usize) -> TGetter2,
     ) -> lazy_seg_type!(
         T = T,
-        A = A,
         TFolded = TFolded,
         TGetter = TGetter2,
         TSetter = TSetter,
+        A = A,
         ASetter = ASetter,
     ) {
         LazySegmentTree {
@@ -247,10 +247,10 @@ where
         map_fn: impl Fn(TSetter2, usize) -> TSetter,
     ) -> lazy_seg_type!(
         T = T,
-        A = A,
         TFolded = TFolded,
         TGetter = TGetter,
         TSetter = TSetter2,
+        A = A,
         ASetter = ASetter,
     ) {
         LazySegmentTree {
@@ -274,10 +274,10 @@ where
         fn_setter: impl Fn(ASetter2) -> A,
     ) -> lazy_seg_type!(
         T = T,
-        A = A,
         TFolded = TFolded,
         TGetter = TGetter,
         TSetter = TSetter,
+        A = A,
         ASetter = ASetter2,
     ) {
         LazySegmentTree {
@@ -300,10 +300,10 @@ where
         map_fn: impl Fn(ASetter2) -> ASetter,
     ) -> lazy_seg_type!(
         T = T,
-        A = A,
         TFolded = TFolded,
         TGetter = TGetter,
         TSetter = TSetter,
+        A = A,
         ASetter = ASetter2,
     ) {
         LazySegmentTree {
@@ -552,10 +552,12 @@ where
 
     let mut tree = Vec::new();
     let len = vec.len();
-    let t_into_folded = |x| x;
-    let t_into_getter = |x, _| x;
-    let t_from_setter = |x, _| x;
-    let a_from_setter = |x| x;
+    fn id_fn<T>(x: T) -> T {
+        x
+    }
+    fn id_fn_idx<T>(x: T, _: usize) -> T {
+        x
+    }
     if len == 0 {
         return LazySegmentTree {
             monoid_action,
@@ -564,10 +566,10 @@ where
             size: len,
             size_pow2: 0,
 
-            t_into_folded,
-            t_into_getter,
-            t_from_setter,
-            a_from_setter,
+            t_into_folded: id_fn,
+            t_into_getter: id_fn_idx,
+            t_from_setter: id_fn_idx,
+            a_from_setter: id_fn,
             phantom: Default::default(),
         };
     }
@@ -603,10 +605,10 @@ where
         size: len,
         size_pow2: len2,
 
-        t_into_folded,
-        t_into_getter,
-        t_from_setter,
-        a_from_setter,
+        t_into_folded: id_fn,
+        t_into_getter: id_fn_idx,
+        t_from_setter: id_fn_idx,
+        a_from_setter: id_fn,
         phantom: Default::default(),
     }
 }
