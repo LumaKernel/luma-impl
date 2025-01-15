@@ -59,7 +59,7 @@ pub struct SegmentTree<
 /// assert_eq!(seg.fold(..), 4);
 /// ```
 #[inline]
-pub fn segment_tree_new<T, Op, Id>(
+pub fn segment_tree_new<T>(
     vec: Vec<T>,
     op: impl Fn(&T, &T) -> T,
     id: impl Fn() -> T,
