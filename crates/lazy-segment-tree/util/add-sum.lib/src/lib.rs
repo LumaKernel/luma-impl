@@ -104,7 +104,7 @@ where
     /// Binary Exponentiation (二分累乗) によって USize による掛け算を定義する
     pub fn set_mul_usize_by_binexp(self) -> Self
     where
-        T: 'static,
+        T: Clone + 'static,
     {
         self.t_add
             .as_ref()
@@ -120,7 +120,7 @@ where
     /// - `add`, `zero` が設定されていること
     pub unsafe fn set_mul_usize_by_binexp_unchecked(mut self) -> Self
     where
-        T: 'static,
+        T: Clone + 'static,
     {
         let t_add = Rc::new(unsafe { self.t_add.take().unwrap_unchecked() });
         self.t_add = Some(Box::new({
@@ -307,7 +307,7 @@ pub fn lazy_segment_tree_new_add_sum_com_ring_mul<T>(
     vec: Vec<T>,
 ) -> lazy_seg_type!(T = (MulticativeCommutativeMonoid<T>, usize), TFolded = T, TGetter = T, TSetter = T, A = MulticativeCommutativeMonoid<T>, ASetter = T)
 where
-    T: CommutativeRing + 'static,
+    T: Clone + CommutativeRing + 'static,
 {
     lazy_segment_tree_new_add_sum_com_ring_mul_shrinkable(vec, NoShrink)
 }
@@ -323,7 +323,7 @@ pub fn lazy_segment_tree_new_add_sum_monoid_shrinkable<T, SP>(
     A = T,
 )
 where
-    T: Monoid + 'static,
+    T: Clone + Monoid + 'static,
     SP: ShrinkProvider + Clone,
 {
     let b = lazy_segment_tree_builder_add_sum_shrinkable(vec, sp).set_add_zero_by_monoid();
@@ -336,7 +336,7 @@ pub fn lazy_segment_tree_new_add_sum_monoid<T>(
     vec: Vec<T>,
 ) -> lazy_seg_type!(T = (T, usize), TFolded = T, TGetter = T, TSetter = T, A = T)
 where
-    T: Monoid + 'static,
+    T: Clone + Monoid + 'static,
 {
     lazy_segment_tree_new_add_sum_monoid_shrinkable(vec, NoShrink)
 }

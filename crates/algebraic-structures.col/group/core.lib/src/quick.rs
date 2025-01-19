@@ -1,5 +1,6 @@
 #[derive(Clone, Copy)]
-pub struct QuickGroup<T, Op, Inv, Id>
+// clone(id) := op(v, id()) とすれば必ず clone が実現可能
+pub struct QuickGroup<T: Clone, Op, Inv, Id>
 where
     Op: Fn(&T, &T) -> T,
     Inv: Fn(&T) -> T,
@@ -9,7 +10,7 @@ where
     inv: Inv,
     id: Id,
 }
-impl<T, Op, Inv, Id> QuickGroup<T, Op, Inv, Id>
+impl<T: Clone, Op, Inv, Id> QuickGroup<T, Op, Inv, Id>
 where
     Op: Fn(&T, &T) -> T,
     Inv: Fn(&T) -> T,
@@ -29,5 +30,5 @@ where
     }
 }
 
-pub type QuickGroupStatic<T> =
+pub type QuickGroupStatic<T: Clone> =
     QuickGroup<T, for<'a, 'b> fn(&'a T, &'b T) -> T, for<'a> fn(&'a T) -> T, fn() -> T>;

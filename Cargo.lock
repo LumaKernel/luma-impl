@@ -398,55 +398,33 @@ name = "segment-tree"
 version = "0.1.0"
 dependencies = [
  "access-range",
- "add-monoid",
  "ceil-log2",
- "max-monoid",
- "min-monoid",
  "monoid",
  "rand",
  "rand_xoshiro",
+ "segment-tree-util-min-max",
+ "segment-tree-util-sum",
  "segment-tree-util-type",
- "transparent-trait",
 ]
 
 [[package]]
-name = "segment-tree-util-add"
+name = "segment-tree-util-min-max"
 version = "0.1.0"
 dependencies = [
- "add-monoid",
+ "max-exists",
+ "min-exists",
+ "segment-tree",
+ "segment-tree-util-type",
+]
+
+[[package]]
+name = "segment-tree-util-sum"
+version = "0.1.0"
+dependencies = [
  "commutative-ring",
  "monoid",
  "segment-tree",
  "segment-tree-util-type",
- "shrink-provider",
-]
-
-[[package]]
-name = "segment-tree-util-max"
-version = "0.1.0"
-dependencies = [
- "max-monoid",
- "min-exists",
- "segment-tree",
-]
-
-[[package]]
-name = "segment-tree-util-min"
-version = "0.1.0"
-dependencies = [
- "max-exists",
- "min-monoid",
- "segment-tree",
-]
-
-[[package]]
-name = "segment-tree-util-new-with-len"
-version = "0.1.0"
-dependencies = [
- "commutative-ring",
- "segment-tree",
- "segment-tree-util-type",
- "shrink-provider",
 ]
 
 [[package]]
@@ -516,6 +494,10 @@ version = "0.1.0"
 dependencies = [
  "min-exists",
 ]
+
+[[package]]
+name = "with-size"
+version = "0.1.0"
 
 [[package]]
 name = "zerocopy"

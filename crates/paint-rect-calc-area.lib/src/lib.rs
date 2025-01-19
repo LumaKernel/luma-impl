@@ -69,8 +69,8 @@ where
             } * (y - last_y).to_same_size_unsigned_int();
         }
         for (d, _y, x1, x2) in chunk {
-            let x1 = unsafe { xs.shrink_unchecked(x1) };
-            let x2 = unsafe { xs.shrink_unchecked(x2) };
+            let x1 = unsafe { xs.shrink_index_unchecked(*x1) };
+            let x2 = unsafe { xs.shrink_index_unchecked(*x2) };
             seg.act(x1..x2, *d);
         }
         last_y = Some(y);

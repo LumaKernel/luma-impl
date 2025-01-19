@@ -3,34 +3,46 @@ use commutative_ring::CommutativeRing;
 use commutative_ring_as_additive_group::quick_group_by_add;
 use group::{group_to_quick, Group, QuickGroup};
 
-pub struct Accumulated<T, U, Op, Inv, Id, ToReturn>
+pub struct Accumulated<T: Clone, TFolded, TIntoFolded, Op, Inv, Id>
 where
     Op: Fn(&T, &T) -> T,
     Inv: Fn(&T) -> T,
     Id: Fn() -> T,
-    ToReturn: Fn(&T) -> U,
+    TIntoFolded: Fn(T) -> TFolded,
 {
     accum: Vec<T>,
     group: QuickGroup<T, Op, Inv, Id>,
-    to_return: ToReturn,
+    t_into_folded: TIntoFolded,
 }
 
-impl<T, U, Op, Inv, Id, ToReturn> Accumulated<T, U, Op, Inv, Id, ToReturn>
+impl<T: Clone, TFolded, TIntoFolded, Op, Inv, Id> Accumulated<T, TFolded, TIntoFolded, Op, Inv, Id>
 where
-    Op: Fn(&T, &T) -> T + 'static,
-    Inv: Fn(&T) -> T + 'static,
-    Id: Fn() -> T + 'static,
-    ToReturn: Fn(&T) -> U + 'static,
+    Op: Fn(&T, &T) -> T,
+    Inv: Fn(&T) -> T,
+    Id: Fn() -> T,
+    TIntoFolded: Fn(T) -> TFolded,
 {
     #[inline]
-    pub fn map_return<U2>(
+    pub fn set_value_folded<TFolded2>(
         self,
-        map_fn: impl Fn(U) -> U2 + 'static,
-    ) -> Accumulated<T, U2, Op, Inv, Id, impl Fn(&T) -> U2 + 'static> {
+        value_folded: impl Fn(T) -> TFolded2,
+    ) -> Accumulated<T, TFolded2, impl Fn(T) -> TFolded2, Op, Inv, Id> {
         Accumulated {
             accum: self.accum,
             group: self.group,
-            to_return: move |x| map_fn((self.to_return)(x)),
+            t_into_folded: value_folded,
+        }
+    }
+
+    #[inline]
+    pub fn map_value_folded<TFolded2>(
+        self,
+        map_fn: impl Fn(TFolded) -> TFolded2,
+    ) -> Accumulated<T, TFolded2, impl Fn(T) -> TFolded2, Op, Inv, Id> {
+        Accumulated {
+            accum: self.accum,
+            group: self.group,
+            t_into_folded: move |x| map_fn((self.t_into_folded)(x)),
         }
     }
 }
@@ -38,16 +50,9 @@ where
 #[inline]
 pub fn accum<T>(
     v: Vec<T>,
-) -> Accumulated<
-    T,
-    T,
-    impl Fn(&T, &T) -> T + 'static,
-    impl Fn(&T) -> T + 'static,
-    impl Fn() -> T + 'static,
-    impl Fn(&T) -> T + 'static,
->
+) -> Accumulated<T, T, impl Fn(T) -> T, impl Fn(&T, &T) -> T, impl Fn(&T) -> T, impl Fn() -> T>
 where
-    T: Clone + Group + 'static,
+    T: Clone + Group,
 {
     let group = group_to_quick();
     let mut accum = Vec::new();
@@ -64,23 +69,16 @@ where
     Accumulated {
         accum,
         group,
-        to_return: |x| x.clone(),
+        t_into_folded: |x| x.clone(),
     }
 }
 
 #[inline]
 pub fn accum_by_add<T>(
     v: Vec<T>,
-) -> Accumulated<
-    T,
-    T,
-    impl Fn(&T, &T) -> T + 'static,
-    impl Fn(&T) -> T + 'static,
-    impl Fn() -> T + 'static,
-    impl Fn(&T) -> T + 'static,
->
+) -> Accumulated<T, T, impl Fn(T) -> T, impl Fn(&T, &T) -> T, impl Fn(&T) -> T, impl Fn() -> T>
 where
-    T: Clone + CommutativeRing + 'static,
+    T: CommutativeRing,
 {
     let group = quick_group_by_add();
     let mut accum = Vec::new();
@@ -90,14 +88,14 @@ where
                 accum.push(group.op(last, &e));
             }
             None => {
-                accum.push(e.clone());
+                accum.push(e);
             }
         }
     }
     Accumulated {
         accum,
         group,
-        to_return: |x| x.clone(),
+        t_into_folded: |x| x,
     }
 }
 
@@ -106,12 +104,12 @@ pub fn accum_by<T, Op, Inv, Id>(
     op: Op,
     inv: Inv,
     id: Id,
-) -> Accumulated<T, T, Op, Inv, Id, impl Fn(&T) -> T + 'static>
+) -> Accumulated<T, T, impl Fn(T) -> T, Op, Inv, Id>
 where
-    T: Clone + 'static,
-    Op: Fn(&T, &T) -> T + 'static,
-    Inv: Fn(&T) -> T + 'static,
-    Id: Fn() -> T + 'static,
+    T: Clone,
+    Op: Fn(&T, &T) -> T,
+    Inv: Fn(&T) -> T,
+    Id: Fn() -> T,
 {
     let group = QuickGroup::new(op, inv, id);
     let mut accum = Vec::new();
@@ -128,21 +126,21 @@ where
     Accumulated {
         accum,
         group,
-        to_return: |x| x.clone(),
+        t_into_folded: |x| x,
     }
 }
 
-impl<T, U, Op, Inv, Id, ToReturn> Accumulated<T, U, Op, Inv, Id, ToReturn>
+impl<T, TFolded, TIntoFolded, Op, Inv, Id> Accumulated<T, TFolded, TIntoFolded, Op, Inv, Id>
 where
     T: Clone,
-    Op: Fn(&T, &T) -> T + 'static,
-    Inv: Fn(&T) -> T + 'static,
-    Id: Fn() -> T + 'static,
-    ToReturn: Fn(&T) -> U + 'static,
+    Op: Fn(&T, &T) -> T,
+    Inv: Fn(&T) -> T,
+    Id: Fn() -> T,
+    TIntoFolded: Fn(T) -> TFolded,
 {
-    pub fn fold(&self, range: impl IntoAccessRange<usize>) -> U {
+    pub fn fold(&self, range: impl IntoAccessRange<usize>) -> TFolded {
         let range = range.into_access_range().into_range(self.accum.len());
-        (self.to_return)(&{
+        (self.t_into_folded)({
             if range.start >= range.end {
                 self.group.id()
             } else if range.start == 0 {
@@ -158,4 +156,4 @@ where
 }
 
 #[cfg(test)]
-mod accum_test;
+mod test;

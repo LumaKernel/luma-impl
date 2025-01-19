@@ -9,7 +9,7 @@ use super::{QuickGroup, QuickGroupStatic};
 ///     - Associativity: a+(b+c) = (a+b)+c
 ///     - Identity: a+0 = 0+a = a
 ///     - Inverse: a+(-a) = (-a)+a = 0
-pub trait Group {
+pub trait Group: Clone {
     fn op(&self, other: &Self) -> Self;
     fn inv(&self) -> Self;
     fn id() -> Self;

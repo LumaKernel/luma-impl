@@ -107,19 +107,19 @@ macro_rules! f {
             }
             pub fn set_ord_auto(self) -> Self
             where
-                T: std::cmp::PartialOrd,
+                T: cmp::PartialOrd,
             {
                 self.set_ord_by_partial_ord()
             }
             pub fn set_ord_by_ord(self) -> Self
             where
-                T: std::cmp::Ord,
+                T: cmp::Ord,
             {
                 self.set_ord(|a, b| a.cmp(b))
             }
             pub fn set_ord_by_partial_ord(self) -> Self
             where
-                T: std::cmp::PartialOrd,
+                T: cmp::PartialOrd,
             {
                 self.set_ord(|a, b| {
                     a.partial_cmp(b).unwrap_or_else(|| {
@@ -194,7 +194,7 @@ macro_rules! f {
         #[doc = include_str!($doc_fn_new)]
         pub fn $fn_new<T>(vec: Vec<T>) -> lazy_seg_type!(T = T)
         where
-            T: Clone + CommutativeRingOrd + std::cmp::PartialOrd + $max_or_min_exists,
+            T: Clone + CommutativeRingOrd + cmp::PartialOrd + $max_or_min_exists,
         {
             let b = $fn_builder(vec).set_all_auto();
             unsafe { b.build_unchecked() }

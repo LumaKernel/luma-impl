@@ -4,23 +4,11 @@ use monoid::{Monoid, QuickMonoid};
 use segment_tree_util_type::seg_type;
 use std::marker::PhantomData;
 
-pub struct SegmentTree<
-    T,
-    TFolded,
-    TFoldedInspect,
-    TGetter,
-    TSetter,
-    TIntoFolded,
-    TIntoFoldedInspect,
-    TIntoGetter,
-    TFromSetter,
-    Op,
-    Id,
-> where
+pub struct SegmentTree<T, TFolded, TGetter, TSetter, TIntoFolded, TIntoGetter, TFromSetter, Op, Id>
+where
     Op: Fn(&T, &T) -> T,
     Id: Fn() -> T,
     TIntoFolded: Fn(T) -> TFolded,
-    TIntoFoldedInspect: Fn(T) -> TFoldedInspect,
     TIntoGetter: Fn(T, /* index */ usize) -> TGetter,
     TFromSetter: Fn(TSetter, /* index */ usize) -> T,
 {
@@ -34,7 +22,6 @@ pub struct SegmentTree<
     size_pow2: usize,
 
     t_into_folded: TIntoFolded,
-    t_into_folded_inspect: TIntoFoldedInspect,
     t_into_getter: TIntoGetter,
     t_from_setter: TFromSetter,
 
@@ -84,7 +71,6 @@ pub fn segment_tree_new<T>(
             size_pow2: 0,
 
             t_into_folded: id_fn,
-            t_into_folded_inspect: id_fn,
             t_into_getter: id_fn_idx,
             t_from_setter: id_fn_idx,
 
@@ -119,7 +105,6 @@ pub fn segment_tree_new<T>(
         size_pow2: len2,
 
         t_into_folded: id_fn,
-        t_into_folded_inspect: id_fn,
         t_into_getter: id_fn_idx,
         t_from_setter: id_fn_idx,
 
@@ -127,37 +112,12 @@ pub fn segment_tree_new<T>(
     }
 }
 
-impl<
-        T,
-        TFolded,
-        TFoldedInspect,
-        TGetter,
-        TSetter,
-        TIntoFolded,
-        TIntoFoldedInspect,
-        TIntoGetter,
-        TFromSetter,
-        Op,
-        Id,
-    >
-    SegmentTree<
-        T,
-        TFolded,
-        TFoldedInspect,
-        TGetter,
-        TSetter,
-        TIntoFolded,
-        TIntoFoldedInspect,
-        TIntoGetter,
-        TFromSetter,
-        Op,
-        Id,
-    >
+impl<T, TFolded, TGetter, TSetter, TIntoFolded, TIntoGetter, TFromSetter, Op, Id>
+    SegmentTree<T, TFolded, TGetter, TSetter, TIntoFolded, TIntoGetter, TFromSetter, Op, Id>
 where
     Op: Fn(&T, &T) -> T,
     Id: Fn() -> T,
     TIntoFolded: Fn(T) -> TFolded,
-    TIntoFoldedInspect: Fn(T) -> TFoldedInspect,
     TIntoGetter: Fn(T, /* index */ usize) -> TGetter,
     TFromSetter: Fn(TSetter, /* index */ usize) -> T,
 {
@@ -168,7 +128,6 @@ where
     ) -> seg_type!(
         T = T,
         TFolded = TFolded2,
-        TFoldedInspect = TFoldedInspect,
         TGetter = TGetter,
         TSetter = TSetter,
     ) {
@@ -180,7 +139,6 @@ where
             size_pow2: self.size_pow2,
 
             t_into_folded,
-            t_into_folded_inspect: self.t_into_folded_inspect,
             t_into_getter: self.t_into_getter,
             t_from_setter: self.t_from_setter,
 
@@ -195,7 +153,6 @@ where
     ) -> seg_type!(
         T = T,
         TFolded = TFolded,
-        TFoldedInspect = TFoldedInspect,
         TGetter = TGetter2,
         TSetter = TSetter,
     ) {
@@ -207,7 +164,6 @@ where
             size_pow2: self.size_pow2,
 
             t_into_folded: self.t_into_folded,
-            t_into_folded_inspect: self.t_into_folded_inspect,
             t_into_getter,
             t_from_setter: self.t_from_setter,
 
@@ -222,7 +178,6 @@ where
     ) -> seg_type!(
         T = T,
         TFolded = TFolded,
-        TFoldedInspect = TFoldedInspect,
         TGetter = TGetter,
         TSetter = TSetter2,
     ) {
@@ -234,7 +189,6 @@ where
             size_pow2: self.size_pow2,
 
             t_into_folded: self.t_into_folded,
-            t_into_folded_inspect: self.t_into_folded_inspect,
             t_into_getter: self.t_into_getter,
             t_from_setter,
 
@@ -443,10 +397,8 @@ where
     ///
     /// # 例
     /// ```
-    /// use segment_tree::*;
-    /// use max_monoid::MaxMonoid;
-    /// let mut seg
-    ///    = segment_tree_new_transparent!(MaxMonoid<_>, vec![1, 4, 2, 3, 8, 3, 4]);
+    /// use segment_tree_util_min_max::segment_tree_new_max;
+    /// let seg = segment_tree_new_max(vec![1, 4, 2, 3, 8, 3, 4]);
     /// assert_eq!(seg.find_index_to_start(4, |x, _| x < 3), 4);
     /// assert_eq!(seg.find_index_to_start(4, |x, _| x < 4), 2);
     /// assert_eq!(seg.find_index_to_start(4, |x, _| x < 8), 0);
@@ -563,9 +515,8 @@ where
     /// # 例
     /// ```
     /// use segment_tree::*;
-    /// use max_monoid::MaxMonoid;
-    /// let mut seg
-    ///    = segment_tree_new_transparent!(MaxMonoid<_>, vec![1, 4, 2, 3, 8, 3, 4]);
+    /// use segment_tree_util_min_max::segment_tree_new_max;
+    /// let seg = segment_tree_new_max(vec![1, 4, 2, 3, 8, 3, 4]);
     /// assert_eq!(seg.find_index_to_end(0, |x, _| x < 4), 1);
     /// assert_eq!(seg.find_index_to_end(0, |x, _| x < 8), 4);
     /// assert_eq!(seg.find_index_to_end(0, |x, _| x < 100), 7);
@@ -658,10 +609,10 @@ where
 
 pub fn segment_tree_new_monoid<T, Op, Id>(vec: Vec<T>) -> seg_type!(T = T)
 where
-    T: Monoid + 'static,
+    T: Monoid,
 {
-    segment_tree_new::<T, fn(&T, &T) -> T, fn() -> T>(vec, T::op, T::id)
+    segment_tree_new(vec, T::op, T::id)
 }
 
 #[cfg(test)]
-mod segment_tree_test;
+mod test;

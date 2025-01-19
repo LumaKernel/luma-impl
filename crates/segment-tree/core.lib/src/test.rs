@@ -1,15 +1,13 @@
-use crate::segment_tree_new_by;
-use add_monoid::AddMonoid;
-use max_monoid::MaxMonoid;
-use min_monoid::MinMonoid;
+use crate::segment_tree_new;
 use rand::{self, Rng, SeedableRng};
 use rand_xoshiro::Xoshiro256PlusPlus;
-use transparent_trait::Transparent;
+use segment_tree_util_min_max::{segment_tree_new_max, segment_tree_new_min};
+use segment_tree_util_sum::segment_tree_new_sum;
 
 #[test]
 fn test_max() {
     let v = vec![1, 4, 2, 3, 8, 3, 4];
-    let mut seg = segment_tree_new_transparent!(MaxMonoid<_>, v);
+    let mut seg = segment_tree_new_max(v);
 
     assert_eq!(seg.fold(0..=0), 1);
     assert_eq!(seg.fold(0), 1);
@@ -47,7 +45,7 @@ fn test_add_full() {
         let mut v = (0..n)
             .map(|_| rng.gen_range(-10000000..10000000))
             .collect::<Vec<_>>();
-        let mut seg = segment_tree_new_transparent!(AddMonoid<_>, v.clone());
+        let mut seg = segment_tree_new_sum(v.clone());
         assert_eq!(seg.size(), n);
 
         if n == 0 {
@@ -62,9 +60,9 @@ fn test_add_full() {
             for k in i..n {
                 let mut sum = seg.monoid().id();
                 for e in v.iter().take(k + 1).skip(i) {
-                    sum = seg.monoid().op(&sum, &(*e).into());
+                    sum = seg.monoid().op(&sum, e);
                 }
-                assert_eq!(seg.fold(i..=k), sum.into_inner());
+                assert_eq!(seg.fold(i..=k), sum);
             }
         }
     }
@@ -73,14 +71,14 @@ fn test_add_full() {
 #[test]
 fn test_find_index_to_start_max_len0() {
     let v: Vec<i32> = vec![];
-    let seg = segment_tree_new_transparent!(MaxMonoid<_>, v);
+    let seg = segment_tree_new_max(v);
     assert_eq!(seg.find_index_to_start(0, |_, _| unreachable!()), 0);
 }
 
 #[test]
 fn test_find_index_to_start_max_len1() {
     let v: Vec<i32> = vec![0];
-    let seg = segment_tree_new_transparent!(MaxMonoid<_>, v);
+    let seg = segment_tree_new_max(v);
     assert_eq!(seg.find_index_to_start(0, |v, _| v < 0), 0);
     assert_eq!(seg.find_index_to_start(0, |v, _| v < 100), 0);
 }
@@ -88,7 +86,7 @@ fn test_find_index_to_start_max_len1() {
 #[test]
 fn test_find_index_to_end_max_len1() {
     let v: Vec<i32> = vec![0];
-    let seg = segment_tree_new_transparent!(MaxMonoid<_>, v);
+    let seg = segment_tree_new_max(v);
     assert_eq!(seg.find_index_to_end(0, |v, _| v < 0), 0);
     assert_eq!(seg.find_index_to_end(0, |v, _| v < 100), 1);
 }
@@ -97,7 +95,7 @@ fn test_find_index_to_end_max_len1() {
 fn test_find_index_to_start_min_index() {
     for n in (1..40).chain(vec![1000]) {
         let v: Vec<usize> = (0..n).collect();
-        let seg = segment_tree_new_transparent!(MinMonoid<_>, v);
+        let seg = segment_tree_new_min(v);
         for t in [0, (n + 1) / 2, (n + 1) / 2 + 1, n, n + 1] {
             seg.find_index_to_start(n, |v, l| {
                 assert_eq!(l, v, "n={n}");
@@ -118,7 +116,7 @@ fn test_find_index_to_end_max_index() {
     for n in 1..40_usize {
         let ns = n as i32;
         let v: Vec<i32> = (0..ns).collect();
-        let seg = segment_tree_new_transparent!(MaxMonoid<_>, v);
+        let seg = segment_tree_new_max(v);
         for t in [0, (ns + 1) / 2, (ns + 1) / 2 + 1, ns, ns + 1] {
             seg.find_index_to_end(0, |v, r| {
                 assert_eq!(r as i32, v + 1, "n={n}");
@@ -145,7 +143,7 @@ fn test_max_full() {
             v[rng.gen_range(0..v.len())]
         };
         let mut v = (0..n).map(|_| rng.gen_range(0..width)).collect::<Vec<_>>();
-        let mut seg = segment_tree_new_transparent!(MaxMonoid<_>, v.clone());
+        let mut seg = segment_tree_new_max(v.clone());
         assert_eq!(seg.size(), n);
 
         if n == 0 {
@@ -160,9 +158,9 @@ fn test_max_full() {
             for k in i..n {
                 let mut sum = seg.monoid().id();
                 for e in v.iter().take(k + 1).skip(i) {
-                    sum = seg.monoid().op(&sum, &(*e).into());
+                    sum = seg.monoid().op(&sum, e);
                 }
-                assert_eq!(seg.fold(i..=k), sum.into_inner());
+                assert_eq!(seg.fold(i..=k), sum);
             }
             for l in 0..n {
                 let t = rng.gen_range(0..width + 1);
@@ -206,7 +204,7 @@ fn test_max_full() {
 fn test_take_right() {
     let v = vec![1, 4, 2, 0, 8, 3, 4, 0, 0, 0, 0, 0, 0, 0, 5, 4];
     // Non-commutative monoid: Take right unless it's 0, or ignore
-    let mut seg = segment_tree_new_by(v, |a, b| if *b == 0 { *a } else { *b }, || 0);
+    let mut seg = segment_tree_new(v, |a, b| if *b == 0 { *a } else { *b }, || 0);
 
     assert_eq!(seg.fold(0), 1);
     assert_eq!(seg.fold(1), 4);
