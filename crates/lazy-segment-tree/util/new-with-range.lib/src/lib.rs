@@ -10,10 +10,10 @@ pub fn lazy_segment_tree_new_with_range<T, A, Op, Id, ActOp, ActId, ActAppWithRa
     act_app_with_range: ActAppWithRange,
 ) -> lazy_seg_type!(
     T = (T, usize, usize),
-    A = A,
     TFolded = T,
     TGetter = T,
     TSetter = T,
+    A = A,
 )
 where
     Op: Fn(&T, &T) -> T,

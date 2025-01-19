@@ -1,16 +1,18 @@
 use access_range::IntoAccessRange;
 use ceil_log2::ceil_log2_usize;
 use monoid::{Monoid, QuickMonoid};
-use transparent_trait::Transparent;
+use segment_tree_util_type::seg_type;
+use std::marker::PhantomData;
 
-pub struct SegmentTree<T, U, Op, Id, ToReturn>
+pub struct SegmentTree<T, TFolded, TGetter, TSetter, TIntoFolded, TIntoGetter, TFromSetter, Op, Id>
 where
     Op: Fn(&T, &T) -> T,
     Id: Fn() -> T,
-    ToReturn: Fn(&T) -> U,
+    TIntoFolded: Fn(T) -> TFolded,
+    TIntoGetter: Fn(T, /* index */ usize) -> TGetter,
+    TFromSetter: Fn(TSetter, /* index */ usize) -> T,
 {
     monoid: QuickMonoid<T, Op, Id>,
-    to_return: ToReturn,
 
     /// tree.size == 2 * size_pow2
     tree: Vec<T>,
@@ -18,83 +20,12 @@ where
     size: usize,
     /// lenをそれ以上の最小の2羃に丸めたもの
     size_pow2: usize,
-}
 
-pub fn segment_tree_new_monoid<T, U, ToReturn>(
-    vec: Vec<T>,
-    to_return: ToReturn,
-) -> SegmentTree<T, U, fn(&T, &T) -> T, fn() -> T, ToReturn>
-where
-    T: Monoid + 'static,
-    ToReturn: Fn(&T) -> U,
-{
-    let monoid = T::as_quick();
-    SegmentTree::new(vec, monoid, to_return)
-}
+    t_into_folded: TIntoFolded,
+    t_into_getter: TIntoGetter,
+    t_from_setter: TFromSetter,
 
-impl<T, U, ToReturn> SegmentTree<T, U, fn(&T, &T) -> T, fn() -> T, ToReturn>
-where
-    ToReturn: Fn(&T) -> U,
-{
-    #[inline(always)]
-    pub fn new_monoid(vec: Vec<T>, to_return: ToReturn) -> Self
-    where
-        T: Monoid + 'static,
-    {
-        let monoid = T::as_quick();
-        Self::new(vec, monoid, to_return)
-    }
-
-    #[inline]
-    pub fn new<Op, Id>(
-        vec: Vec<T>,
-        monoid: QuickMonoid<T, Op, Id>,
-        to_return: ToReturn,
-    ) -> SegmentTree<T, U, Op, Id, ToReturn>
-    where
-        Op: Fn(&T, &T) -> T,
-        Id: Fn() -> T,
-    {
-        let mut tree = Vec::new();
-        let len = vec.len();
-        if len == 0 {
-            return SegmentTree {
-                monoid,
-                to_return,
-
-                tree,
-                size: len,
-                size_pow2: 0,
-            };
-        }
-
-        let height = ceil_log2_usize(len);
-        let len2 = 1 << height;
-
-        tree.reserve_exact(len2 * 2);
-        // Padding identities for the rest spaces.
-        for _ in 0..(len2 - len) {
-            tree.push(monoid.id());
-        }
-        for e in vec.into_iter().rev() {
-            tree.push(e);
-        }
-        for i in 0..len2 - 1 {
-            let right = &unsafe { tree.get_unchecked(i * 2) };
-            let left = &unsafe { tree.get_unchecked(i * 2 + 1) };
-            tree.push(monoid.op(left, right));
-        }
-        tree.push(monoid.id());
-        tree.reverse();
-        debug_assert_eq!(tree.len(), len2 * 2);
-        SegmentTree {
-            monoid,
-            to_return,
-            tree,
-            size: len,
-            size_pow2: len2,
-        }
-    }
+    phantom: PhantomData<TSetter>,
 }
 
 /// # セグメントツリーの構築 (モノイドの直接指定)
@@ -108,78 +39,160 @@ where
 /// ## 例
 ///
 /// ```
-/// use segment_tree::segment_tree_new_by;
-/// let mut seg = segment_tree_new_by(vec![1, 4, 2, 3, 8, 3, 4], |a, b| a.max(b).clone(), || 0);
+/// use segment_tree::segment_tree_new;
+/// let mut seg = segment_tree_new(vec![1, 4, 2, 3, 8, 3, 4], |a, b| a.max(b).clone(), || 0);
 /// assert_eq!(seg.fold(1..5), 8);
 /// seg.set(4, 0);
 /// assert_eq!(seg.fold(..), 4);
 /// ```
 #[inline]
-pub fn segment_tree_new_by<T, Op, Id>(
+pub fn segment_tree_new<T>(
     vec: Vec<T>,
-    op: Op,
-    id: Id,
-) -> SegmentTree<T, T, Op, Id, fn(&T) -> T>
+    op: impl Fn(&T, &T) -> T,
+    id: impl Fn() -> T,
+) -> seg_type!(T = T) {
+    fn id_fn<T>(x: T) -> T {
+        x
+    }
+    fn id_fn_idx<T>(x: T, _: usize) -> T {
+        x
+    }
+
+    let monoid = QuickMonoid::new(op, id);
+
+    let mut tree = Vec::new();
+    let len = vec.len();
+    if len == 0 {
+        return SegmentTree {
+            monoid,
+
+            tree,
+            size: len,
+            size_pow2: 0,
+
+            t_into_folded: id_fn,
+            t_into_getter: id_fn_idx,
+            t_from_setter: id_fn_idx,
+
+            phantom: PhantomData,
+        };
+    }
+
+    let height = ceil_log2_usize(len);
+    let len2 = 1 << height;
+
+    tree.reserve_exact(len2 * 2);
+    // Padding identities for the rest spaces.
+    for _ in 0..(len2 - len) {
+        tree.push(monoid.id());
+    }
+    for e in vec.into_iter().rev() {
+        tree.push(e);
+    }
+    for i in 0..len2 - 1 {
+        let right = &unsafe { tree.get_unchecked(i * 2) };
+        let left = &unsafe { tree.get_unchecked(i * 2 + 1) };
+        tree.push(monoid.op(left, right));
+    }
+    tree.push(monoid.id());
+    tree.reverse();
+    debug_assert_eq!(tree.len(), len2 * 2);
+    SegmentTree {
+        monoid,
+
+        tree,
+        size: len,
+        size_pow2: len2,
+
+        t_into_folded: id_fn,
+        t_into_getter: id_fn_idx,
+        t_from_setter: id_fn_idx,
+
+        phantom: PhantomData,
+    }
+}
+
+impl<T, TFolded, TGetter, TSetter, TIntoFolded, TIntoGetter, TFromSetter, Op, Id>
+    SegmentTree<T, TFolded, TGetter, TSetter, TIntoFolded, TIntoGetter, TFromSetter, Op, Id>
 where
-    T: Clone,
     Op: Fn(&T, &T) -> T,
     Id: Fn() -> T,
-{
-    fn to_return<T: Clone>(x: &T) -> T {
-        x.clone()
-    }
-    SegmentTree::new(vec, QuickMonoid::new(op, id), to_return as fn(&T) -> T)
-}
-
-#[inline]
-pub fn segment_tree_new_transparent<T, TInner>(
-    v: Vec<TInner>,
-) -> SegmentTree<T, TInner, fn(&T, &T) -> T, fn() -> T, fn(&T) -> TInner>
-where
-    T: Monoid + Transparent<Inner = TInner> + Clone + 'static,
-{
-    fn to_inner<T, TInner>(x: &T) -> TInner
-    where
-        T: Transparent<Inner = TInner> + Clone,
-    {
-        x.clone().into_inner()
-    }
-    SegmentTree::new_monoid(
-        v.into_iter().map(T::from_inner).collect(),
-        to_inner as fn(&T) -> TInner,
-    )
-}
-
-/// ```
-/// use segment_tree::*;
-/// use max_monoid::MaxMonoid;
-/// let mut seg = segment_tree_new_transparent!(MaxMonoid<_>, vec![1, 4, 2, 3, 8, 3, 4]);
-/// assert_eq!(seg.fold(1..5), 8);
-/// ```
-#[macro_export]
-macro_rules! segment_tree_new_transparent {
-    ($t:ty, $v:expr) => {
-        $crate::segment_tree_new_transparent::<$t, _>($v)
-    };
-}
-
-impl<T, U, Op, Id, ToReturn> SegmentTree<T, U, Op, Id, ToReturn>
-where
-    Op: Fn(&T, &T) -> T + 'static,
-    Id: Fn() -> T + 'static,
-    ToReturn: Fn(&T) -> U + 'static,
+    TIntoFolded: Fn(T) -> TFolded,
+    TIntoGetter: Fn(T, /* index */ usize) -> TGetter,
+    TFromSetter: Fn(TSetter, /* index */ usize) -> T,
 {
     #[inline(always)]
-    pub fn map_return<U2>(
+    pub fn set_value_folded<TFolded2>(
         self,
-        map_fn: impl Fn(U) -> U2 + 'static,
-    ) -> SegmentTree<T, U2, Op, Id, impl Fn(&T) -> U2 + 'static> {
+        t_into_folded: impl Fn(T) -> TFolded2,
+    ) -> seg_type!(
+        T = T,
+        TFolded = TFolded2,
+        TGetter = TGetter,
+        TSetter = TSetter,
+    ) {
         SegmentTree {
             monoid: self.monoid,
-            to_return: move |x| map_fn((self.to_return)(x)),
+
             tree: self.tree,
             size: self.size,
             size_pow2: self.size_pow2,
+
+            t_into_folded,
+            t_into_getter: self.t_into_getter,
+            t_from_setter: self.t_from_setter,
+
+            phantom: PhantomData,
+        }
+    }
+
+    #[inline(always)]
+    pub fn set_value_getter<TGetter2>(
+        self,
+        t_into_getter: impl Fn(T, usize) -> TGetter2,
+    ) -> seg_type!(
+        T = T,
+        TFolded = TFolded,
+        TGetter = TGetter2,
+        TSetter = TSetter,
+    ) {
+        SegmentTree {
+            monoid: self.monoid,
+
+            tree: self.tree,
+            size: self.size,
+            size_pow2: self.size_pow2,
+
+            t_into_folded: self.t_into_folded,
+            t_into_getter,
+            t_from_setter: self.t_from_setter,
+
+            phantom: PhantomData,
+        }
+    }
+
+    #[inline(always)]
+    pub fn set_value_setter<TSetter2>(
+        self,
+        t_from_setter: impl Fn(TSetter2, usize) -> T,
+    ) -> seg_type!(
+        T = T,
+        TFolded = TFolded,
+        TGetter = TGetter,
+        TSetter = TSetter2,
+    ) {
+        SegmentTree {
+            monoid: self.monoid,
+
+            tree: self.tree,
+            size: self.size,
+            size_pow2: self.size_pow2,
+
+            t_into_folded: self.t_into_folded,
+            t_into_getter: self.t_into_getter,
+            t_from_setter,
+
+            phantom: PhantomData,
         }
     }
 
@@ -232,14 +245,19 @@ where
     ///
     /// $O(log N)$
     #[inline]
-    pub fn fold(&self, range: impl IntoAccessRange<usize>) -> U {
+    pub fn fold(&self, range: impl IntoAccessRange<usize>) -> TFolded {
+        (self.t_into_folded)(self.fold_internal(range))
+    }
+
+    #[inline]
+    fn fold_internal(&self, range: impl IntoAccessRange<usize>) -> T {
         if self.size == 0 {
-            return (self.to_return)(&self.monoid.id());
+            return self.monoid.id();
         }
         let range = range.into_access_range().into_range(self.size);
 
         if range.start >= range.end {
-            return (self.to_return)(&self.monoid.id());
+            return self.monoid.id();
         }
 
         let mut l = self.leaf_of(range.start);
@@ -265,7 +283,7 @@ where
             r = self.parent_tree_index(r);
         }
         debug_assert!(l == r || l == r + 1, "l: {}, r: {}", l, r);
-        (self.to_return)(&self.monoid.op(&left_folded, &right_folded))
+        self.monoid.op(&left_folded, &right_folded)
     }
 
     /// # 取得
@@ -274,9 +292,15 @@ where
     ///
     /// $O(1)$
     #[inline(always)]
-    pub fn get(&self, index: usize) -> U {
+    pub fn get(&self, index: usize) -> TGetter {
         assert!(index < self.size, "index out of range: {}", index);
-        (self.to_return)(unsafe { self.tree.get_unchecked(self.leaf_of(index)) })
+        (self.t_into_getter)(
+            self.monoid.op(
+                unsafe { self.tree.get_unchecked(self.leaf_of(index)) },
+                &self.monoid.id(),
+            ),
+            index,
+        )
     }
 
     /// # セット
@@ -285,7 +309,7 @@ where
     ///
     /// $O(log N)$
     #[inline]
-    pub fn set(&mut self, index: usize, value: impl Into<T>) {
+    pub fn set(&mut self, index: usize, value: impl Into<TSetter>) {
         self.update(index, |_| value);
     }
 
@@ -297,15 +321,22 @@ where
     #[inline]
     pub fn update<F, V>(&mut self, index: usize, update_fn: F)
     where
-        F: FnOnce(&T) -> V,
-        V: Into<T>,
+        F: FnOnce(TGetter) -> V,
+        V: Into<TSetter>,
     {
         if index >= self.size {
             panic!("index out of range: {}", index);
         }
         let mut index = self.leaf_of(index);
-        *unsafe { self.tree.get_unchecked_mut(index) } =
-            update_fn(unsafe { self.tree.get_unchecked(index) }).into();
+        *unsafe { self.tree.get_unchecked_mut(index) } = (self.t_from_setter)(
+            update_fn((self.t_into_getter)(
+                self.monoid
+                    .op(unsafe { self.tree.get_unchecked(index) }, &self.monoid.id()),
+                index,
+            ))
+            .into(),
+            index,
+        );
         while index > self.root_node() {
             index = self.parent_tree_index(index);
             let (left, right) = self.children_indices(index);
@@ -366,10 +397,8 @@ where
     ///
     /// # 例
     /// ```
-    /// use segment_tree::*;
-    /// use max_monoid::MaxMonoid;
-    /// let mut seg
-    ///    = segment_tree_new_transparent!(MaxMonoid<_>, vec![1, 4, 2, 3, 8, 3, 4]);
+    /// use segment_tree_util_min_max::segment_tree_new_max;
+    /// let seg = segment_tree_new_max(vec![1, 4, 2, 3, 8, 3, 4]);
     /// assert_eq!(seg.find_index_to_start(4, |x, _| x < 3), 4);
     /// assert_eq!(seg.find_index_to_start(4, |x, _| x < 4), 2);
     /// assert_eq!(seg.find_index_to_start(4, |x, _| x < 8), 0);
@@ -377,7 +406,7 @@ where
     #[inline]
     pub fn find_index_to_start<F>(&self, r: usize, cond_fn: F) -> usize
     where
-        F: Fn(U, usize) -> bool,
+        F: Fn(TFolded, usize) -> bool,
     {
         assert!(
             r <= self.size,
@@ -406,9 +435,8 @@ where
             macro_rules! cond {
                 () => {
                     cond_fn(
-                        (self.to_return)(
-                            &self
-                                .monoid
+                        (self.t_into_folded)(
+                            self.monoid
                                 .op(unsafe { self.tree.get_unchecked(cur) }, &done),
                         ),
                         done_l - cur_len,
@@ -487,9 +515,8 @@ where
     /// # 例
     /// ```
     /// use segment_tree::*;
-    /// use max_monoid::MaxMonoid;
-    /// let mut seg
-    ///    = segment_tree_new_transparent!(MaxMonoid<_>, vec![1, 4, 2, 3, 8, 3, 4]);
+    /// use segment_tree_util_min_max::segment_tree_new_max;
+    /// let seg = segment_tree_new_max(vec![1, 4, 2, 3, 8, 3, 4]);
     /// assert_eq!(seg.find_index_to_end(0, |x, _| x < 4), 1);
     /// assert_eq!(seg.find_index_to_end(0, |x, _| x < 8), 4);
     /// assert_eq!(seg.find_index_to_end(0, |x, _| x < 100), 7);
@@ -497,7 +524,7 @@ where
     #[inline]
     pub fn find_index_to_end<F>(&self, l: usize, cond_fn: F) -> usize
     where
-        F: Fn(U, usize) -> bool,
+        F: Fn(TFolded, usize) -> bool,
     {
         assert!(
             l < self.size(),
@@ -525,9 +552,8 @@ where
                 () => {
                     (done_r + cur_len) <= self.size
                         && cond_fn(
-                            (self.to_return)(
-                                &self
-                                    .monoid
+                            (self.t_into_folded)(
+                                self.monoid
                                     .op(&done, unsafe { self.tree.get_unchecked(cur) }),
                             ),
                             done_r + cur_len,
@@ -581,5 +607,12 @@ where
     }
 }
 
+pub fn segment_tree_new_monoid<T, Op, Id>(vec: Vec<T>) -> seg_type!(T = T)
+where
+    T: Monoid,
+{
+    segment_tree_new(vec, T::op, T::id)
+}
+
 #[cfg(test)]
-mod segment_tree_test;
+mod test;

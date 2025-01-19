@@ -13,10 +13,10 @@ pub fn lazy_segment_tree_new_with_len_shrinkable<T, A, Op, Id, ActOp, ActId, Act
     sp: SP,
 ) -> lazy_seg_type!(
     T = (T, SP::USize),
-    A = A,
     TFolded = T,
     TGetter = T,
-    TSetter = T
+    TSetter = T,
+    A = A,
 )
 where
     Op: Fn(&T, &T) -> T,
@@ -52,7 +52,7 @@ pub fn lazy_segment_tree_new_with_len<T, A, Op, Id, ActOp, ActId, ActAppWithLen>
     act_op: ActOp,
     act_id: ActId,
     act_app_with_len: ActAppWithLen,
-) -> lazy_seg_type!(T = (T, usize), A = A, TFolded = T, TGetter = T, TSetter = T)
+) -> lazy_seg_type!(T = (T, usize), TFolded = T, TGetter = T, TSetter = T, A = A)
 where
     Op: Fn(&T, &T) -> T,
     Id: Fn() -> T,

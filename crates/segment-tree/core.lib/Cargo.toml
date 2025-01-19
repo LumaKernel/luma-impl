@@ -1,0 +1,16 @@
+[package]
+name = "segment-tree"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+access-range = { path = "../../access-range.lib" }
+ceil-log2 = { path = "../../ceil-log2.lib" }
+monoid = { path = "../../algebraic-structures.col/monoid.col/monoid.lib" }
+segment-tree-util-type = { path = "../util/type.lib" }
+
+[dev-dependencies]
+rand = "0.8.5"
+rand_xoshiro = "0.6.0"
+segment-tree-util-min-max = { path = "../util/min-max.lib" }
+segment-tree-util-sum = { path = "../util/sum.lib" }

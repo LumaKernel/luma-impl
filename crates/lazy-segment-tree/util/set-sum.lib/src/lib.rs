@@ -160,10 +160,10 @@ where
         self,
     ) -> lazy_seg_type!(
            T = (T, SP::USize),
-           A = Option<T>,
            TFolded = T,
            TGetter = T,
            TSetter = T,
+           A = Option<T>,
            ASetter = T,
        ) {
         self.t_add
@@ -172,6 +172,12 @@ where
         self.t_zero
             .as_ref()
             .or_else(|| panic!("{}: zero is not set", stringify!(LazySegmentTreeSetSum)));
+        self.t_mul_usize.as_ref().or_else(|| {
+            panic!(
+                "{}: mul_usize is not set",
+                stringify!(LazySegmentTreeSetSum),
+            )
+        });
         unsafe { self.build_unchecked() }
     }
 
@@ -181,10 +187,10 @@ where
         self,
     ) -> lazy_seg_type!(
            T = (T, SP::USize),
-           A = Option<T>,
            TFolded = T,
            TGetter = T,
            TSetter = T,
+           A = Option<T>,
            ASetter = T,
        ) {
         let t_add = unsafe { self.t_add.unwrap_unchecked() };
@@ -231,10 +237,10 @@ pub fn lazy_segment_tree_new_set_sum_shrinkable<T, SP>(
     sp: SP,
 ) -> lazy_seg_type!(
        T = (T, SP::USize),
-       A = Option<T>,
        TFolded = T,
        TGetter = T,
        TSetter = T,
+       A = Option<T>,
        ASetter = T,
    )
 where
@@ -250,7 +256,7 @@ where
 #[doc = include_str!("../doc_new_set_sum.md")]
 pub fn lazy_segment_tree_new_set_sum<T>(
     vec: Vec<T>,
-) -> lazy_seg_type!(T = (T, usize), A = Option<T>, TFolded = T, TGetter = T, TSetter = T, ASetter = T)
+) -> lazy_seg_type!(T = (T, usize), TFolded = T, TGetter = T, TSetter = T, A = Option<T>, ASetter = T)
 where
     T: Clone + CommutativeRing + TryFrom<usize> + ops::Mul<Output = T>,
 {
@@ -260,7 +266,7 @@ where
 pub fn lazy_segment_tree_new_set_sum_com_ring_add_shrinkable<T, SP>(
     vec: Vec<T>,
     sp: SP,
-) -> lazy_seg_type!(T = (GroupAsMonoid<AdditiveGroup<T>>, SP::USize), A = Option<GroupAsMonoid<AdditiveGroup<T>>>, TFolded = T, TGetter = T, TSetter = T, ASetter = T)
+) -> lazy_seg_type!(T = (GroupAsMonoid<AdditiveGroup<T>>, SP::USize), TFolded = T, TGetter = T, TSetter = T, A = Option<GroupAsMonoid<AdditiveGroup<T>>>, ASetter = T)
 where
     T: Clone + CommutativeRing + 'static,
     SP: ShrinkProvider + Clone,
@@ -280,7 +286,7 @@ where
 
 pub fn lazy_segment_tree_new_set_sum_com_ring_add<T>(
     vec: Vec<T>,
-) -> lazy_seg_type!(T = (GroupAsMonoid<AdditiveGroup<T>>, usize), A = Option<GroupAsMonoid<AdditiveGroup<T>>>, TFolded = T, TGetter = T, TSetter = T, ASetter = T)
+) -> lazy_seg_type!(T = (GroupAsMonoid<AdditiveGroup<T>>, usize), TFolded = T, TGetter = T, TSetter = T, A = Option<GroupAsMonoid<AdditiveGroup<T>>>, ASetter = T)
 where
     T: Clone + CommutativeRing + 'static,
 {
@@ -290,7 +296,7 @@ where
 pub fn lazy_segment_tree_new_set_sum_com_ring_mul_shrinkable<T, SP>(
     vec: Vec<T>,
     sp: SP,
-) -> lazy_seg_type!(T = (MulticativeCommutativeMonoid<T>, SP::USize), A = Option<MulticativeCommutativeMonoid<T>>, TFolded = T, TGetter = T, TSetter = T, ASetter = T)
+) -> lazy_seg_type!(T = (MulticativeCommutativeMonoid<T>, SP::USize), TFolded = T, TGetter = T, TSetter = T, A = Option<MulticativeCommutativeMonoid<T>>, ASetter = T)
 where
     T: Clone + CommutativeRing + 'static,
     SP: ShrinkProvider + Clone,
@@ -307,7 +313,7 @@ where
 
 pub fn lazy_segment_tree_new_set_sum_com_ring_mul<T>(
     vec: Vec<T>,
-) -> lazy_seg_type!(T = (MulticativeCommutativeMonoid<T>, usize), A = Option<MulticativeCommutativeMonoid<T>>, TFolded = T, TGetter = T, TSetter = T, ASetter = T)
+) -> lazy_seg_type!(T = (MulticativeCommutativeMonoid<T>, usize), TFolded = T, TGetter = T, TSetter = T, A = Option<MulticativeCommutativeMonoid<T>>, ASetter = T)
 where
     T: Clone + CommutativeRing + 'static,
 {
@@ -319,10 +325,10 @@ pub fn lazy_segment_tree_new_set_sum_monoid_shrinkable<T, SP>(
     sp: SP,
 ) -> lazy_seg_type!(
        T = (T, SP::USize),
-       A = Option<T>,
        TFolded = T,
        TGetter = T,
        TSetter = T,
+       A = Option<T>,
        ASetter = T,
    )
 where
@@ -337,7 +343,7 @@ where
 #[doc = include_str!("../doc_new_set_sum_monoid.md")]
 pub fn lazy_segment_tree_new_set_sum_monoid<T>(
     vec: Vec<T>,
-) -> lazy_seg_type!(T = (T, usize), A = Option<T>, TFolded = T, TGetter = T, TSetter = T, ASetter = T)
+) -> lazy_seg_type!(T = (T, usize), TFolded = T, TGetter = T, TSetter = T, A = Option<T>, ASetter = T)
 where
     T: Clone + Monoid + 'static,
 {

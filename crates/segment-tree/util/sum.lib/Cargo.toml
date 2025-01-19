@@ -1,0 +1,10 @@
+[package]
+name = "segment-tree-util-sum"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+commutative-ring = { path = "../../../algebraic-structures.col/commutative-ring/core.lib" }
+monoid = { path = "../../../algebraic-structures.col/monoid.col/monoid.lib" }
+segment-tree = { path = "../../core.lib" }
+segment-tree-util-type = { path = "../type.lib" }

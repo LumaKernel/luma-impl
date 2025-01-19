@@ -89,10 +89,10 @@ macro_rules! f {
                 self,
             ) -> lazy_seg_type!(
                    T = ($min_or_max_count<T, SP::USize>, SP::USize),
-                   A = Option<T>,
                    TFolded = $min_or_max_count<T, SP::USize>,
                    TGetter = T,
                    TSetter = T,
+                   A = Option<T>,
                    ASetter = T,
                ) {
                 self.t_max_or_min_exists.as_ref().or_else(|| {
@@ -112,10 +112,10 @@ macro_rules! f {
                 self,
             ) -> lazy_seg_type!(
                    T = ($min_or_max_count<T, SP::USize>, SP::USize),
-                   A = Option<T>,
                    TFolded = $min_or_max_count<T, SP::USize>,
                    TGetter = T,
                    TSetter = T,
+                   A = Option<T>,
                    ASetter = T,
                ) {
                 let t_max_or_min_exists = unsafe { self.t_max_or_min_exists.unwrap_unchecked() };
@@ -207,10 +207,10 @@ macro_rules! f {
             sp: SP,
         ) -> lazy_seg_type!(
               T = ($min_or_max_count<T, SP::USize>, SP::USize),
-              A = Option<T>,
               TFolded = $min_or_max_count<T, SP::USize>,
               TGetter = T,
               TSetter = T,
+              A = Option<T>,
               ASetter = T,
            )
         where
@@ -226,10 +226,10 @@ macro_rules! f {
             vec: Vec<T>,
         ) -> lazy_seg_type!(
               T = ($min_or_max_count<T, usize>, usize),
-              A = Option<T>,
               TFolded = $min_or_max_count<T, usize>,
               TGetter = T,
               TSetter = T,
+              A = Option<T>,
               ASetter = T,
            )
         where

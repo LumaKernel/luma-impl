@@ -107,19 +107,19 @@ macro_rules! f {
             }
             pub fn set_ord_auto(self) -> Self
             where
-                T: std::cmp::PartialOrd,
+                T: cmp::PartialOrd,
             {
                 self.set_ord_by_partial_ord()
             }
             pub fn set_ord_by_ord(self) -> Self
             where
-                T: std::cmp::Ord,
+                T: cmp::Ord,
             {
                 self.set_ord(|a, b| a.cmp(b))
             }
             pub fn set_ord_by_partial_ord(self) -> Self
             where
-                T: std::cmp::PartialOrd,
+                T: cmp::PartialOrd,
             {
                 self.set_ord(|a, b| {
                     a.partial_cmp(b).unwrap_or_else(|| {
@@ -142,7 +142,7 @@ macro_rules! f {
                 self.$set_max_or_min_exists(|| T::$max_or_min_exists_method())
             }
 
-            pub fn build(self) -> lazy_seg_type!(T = T, A = T) {
+            pub fn build(self) -> lazy_seg_type!(T = T) {
                 self.t_add
                     .as_ref()
                     .or_else(|| panic!("{}: add is not set", stringify!($builder_name)));
@@ -162,7 +162,7 @@ macro_rules! f {
             }
             /// ## Safety
             /// - すべてのメソッドが設定されていること
-            pub unsafe fn build_unchecked(self) -> lazy_seg_type!(T = T, A = T) {
+            pub unsafe fn build_unchecked(self) -> lazy_seg_type!(T = T) {
                 let t_add = Rc::new(unsafe { self.t_add.unwrap_unchecked() });
                 let t_zero = unsafe { self.t_zero.unwrap_unchecked() };
                 let t_max_or_min_exists = unsafe { self.t_max_or_min_exists.unwrap_unchecked() };
@@ -192,9 +192,9 @@ macro_rules! f {
         }
 
         #[doc = include_str!($doc_fn_new)]
-        pub fn $fn_new<T>(vec: Vec<T>) -> lazy_seg_type!(T = T, A = T)
+        pub fn $fn_new<T>(vec: Vec<T>) -> lazy_seg_type!(T = T)
         where
-            T: Clone + CommutativeRingOrd + std::cmp::PartialOrd + $max_or_min_exists,
+            T: Clone + CommutativeRingOrd + cmp::PartialOrd + $max_or_min_exists,
         {
             let b = $fn_builder(vec).set_all_auto();
             unsafe { b.build_unchecked() }

@@ -12,7 +12,6 @@ use std::rc::Rc;
 
 pub struct LazySegmentTreeAddSum<T, SP>
 where
-    T: Clone,
     SP: ShrinkProvider + Clone,
 {
     vec: Vec<T>,
@@ -24,7 +23,6 @@ where
 
 impl<T, SP> LazySegmentTreeAddSum<T, SP>
 where
-    T: Clone,
     SP: ShrinkProvider + Clone,
 {
     pub fn new(vec: Vec<T>, sp: SP) -> Self {
@@ -61,7 +59,7 @@ where
     }
     pub fn set_add_by_add(self) -> Self
     where
-        T: ops::Add<Output = T>,
+        T: Clone + ops::Add<Output = T>,
     {
         self.set_add(|a, b| a.clone() + b.clone())
     }
@@ -83,13 +81,13 @@ where
     }
     pub fn set_mul_usize_auto(self) -> Self
     where
-        T: TryFrom<SP::USize> + ops::Mul<Output = T>,
+        T: Clone + TryFrom<SP::USize> + ops::Mul<Output = T>,
     {
         self.set_mul_usize_by_mul()
     }
     pub fn set_mul_usize_by_mul(self) -> Self
     where
-        T: TryFrom<SP::USize> + ops::Mul<Output = T>,
+        T: Clone + TryFrom<SP::USize> + ops::Mul<Output = T>,
     {
         self.set_mul_usize(|x, len| {
             let len = len.try_into().unwrap_or_else(|_| {
@@ -106,7 +104,7 @@ where
     /// Binary Exponentiation (二分累乗) によって USize による掛け算を定義する
     pub fn set_mul_usize_by_binexp(self) -> Self
     where
-        T: 'static,
+        T: Clone + 'static,
     {
         self.t_add
             .as_ref()
@@ -122,7 +120,7 @@ where
     /// - `add`, `zero` が設定されていること
     pub unsafe fn set_mul_usize_by_binexp_unchecked(mut self) -> Self
     where
-        T: 'static,
+        T: Clone + 'static,
     {
         let t_add = Rc::new(unsafe { self.t_add.take().unwrap_unchecked() });
         self.t_add = Some(Box::new({
@@ -154,10 +152,10 @@ where
         self,
     ) -> lazy_seg_type!(
         T = (T, SP::USize),
-        A = T,
         TFolded = T,
         TGetter = T,
-        TSetter = T
+        TSetter = T,
+        A = T,
     ) {
         self.t_add
             .as_ref()
@@ -180,10 +178,10 @@ where
         self,
     ) -> lazy_seg_type!(
         T = (T, SP::USize),
-        A = T,
         TFolded = T,
         TGetter = T,
-        TSetter = T
+        TSetter = T,
+        A = T,
     ) {
         let t_add = Rc::new(unsafe { self.t_add.unwrap_unchecked() });
         let t_zero = Rc::new(unsafe { self.t_zero.unwrap_unchecked() });
@@ -214,7 +212,6 @@ pub fn lazy_segment_tree_builder_add_sum_shrinkable<T, SP>(
     sp: SP,
 ) -> LazySegmentTreeAddSum<T, SP>
 where
-    T: Clone,
     SP: ShrinkProvider + Clone,
 {
     LazySegmentTreeAddSum::new(vec, sp)
@@ -232,10 +229,10 @@ pub fn lazy_segment_tree_new_add_sum_shrinkable<T, SP>(
     sp: SP,
 ) -> lazy_seg_type!(
     T = (T, SP::USize),
-    A = T,
     TFolded = T,
     TGetter = T,
     TSetter = T,
+    A = T,
 )
 where
     T: Clone + CommutativeRing + TryFrom<SP::USize> + ops::Mul<Output = T>,
@@ -250,7 +247,7 @@ where
 #[doc = include_str!("../doc_new_add_sum.md")]
 pub fn lazy_segment_tree_new_add_sum<T>(
     vec: Vec<T>,
-) -> lazy_seg_type!(T = (T, usize), A = T, TFolded = T, TGetter = T, TSetter = T)
+) -> lazy_seg_type!(T = (T, usize), TFolded = T, TGetter = T, TSetter = T, A = T)
 where
     T: Clone + CommutativeRing + TryFrom<usize> + ops::Mul<Output = T>,
 {
@@ -260,7 +257,8 @@ where
 pub fn lazy_segment_tree_new_add_sum_com_ring_add_shrinkable<T, SP>(
     vec: Vec<T>,
     sp: SP,
-) -> lazy_seg_type!(T = (GroupAsMonoid<AdditiveGroup<T>>, SP::USize), A = GroupAsMonoid<AdditiveGroup<T>>, TFolded = T, TGetter = T, TSetter = T, ASetter = T)
+) -> lazy_seg_type!(
+T = (GroupAsMonoid<AdditiveGroup<T>>, SP::USize), TFolded = T, TGetter = T, TSetter = T, A = GroupAsMonoid<AdditiveGroup<T>>, ASetter = T)
 where
     T: Clone + CommutativeRing + 'static,
     SP: ShrinkProvider + Clone,
@@ -280,7 +278,7 @@ where
 
 pub fn lazy_segment_tree_new_add_sum_com_ring_add<T>(
     vec: Vec<T>,
-) -> lazy_seg_type!(T = (GroupAsMonoid<AdditiveGroup<T>>, usize), A = GroupAsMonoid<AdditiveGroup<T>>, TFolded = T, TGetter = T, TSetter = T, ASetter = T)
+) -> lazy_seg_type!(T = (GroupAsMonoid<AdditiveGroup<T>>, usize), TFolded = T, TGetter = T, TSetter = T, A = GroupAsMonoid<AdditiveGroup<T>>, ASetter = T)
 where
     T: Clone + CommutativeRing + 'static,
 {
@@ -290,7 +288,7 @@ where
 pub fn lazy_segment_tree_new_add_sum_com_ring_mul_shrinkable<T, SP>(
     vec: Vec<T>,
     sp: SP,
-) -> lazy_seg_type!(T = (MulticativeCommutativeMonoid<T>, SP::USize), A = MulticativeCommutativeMonoid<T>, TFolded = T, TGetter = T, TSetter = T, ASetter = T)
+) -> lazy_seg_type!(T = (MulticativeCommutativeMonoid<T>, SP::USize), TFolded = T, TGetter = T, TSetter = T, A = MulticativeCommutativeMonoid<T>, ASetter = T)
 where
     T: Clone + CommutativeRing + 'static,
     SP: ShrinkProvider + Clone,
@@ -307,7 +305,7 @@ where
 
 pub fn lazy_segment_tree_new_add_sum_com_ring_mul<T>(
     vec: Vec<T>,
-) -> lazy_seg_type!(T = (MulticativeCommutativeMonoid<T>, usize), A = MulticativeCommutativeMonoid<T>, TFolded = T, TGetter = T, TSetter = T, ASetter = T)
+) -> lazy_seg_type!(T = (MulticativeCommutativeMonoid<T>, usize), TFolded = T, TGetter = T, TSetter = T, A = MulticativeCommutativeMonoid<T>, ASetter = T)
 where
     T: Clone + CommutativeRing + 'static,
 {
@@ -319,10 +317,10 @@ pub fn lazy_segment_tree_new_add_sum_monoid_shrinkable<T, SP>(
     sp: SP,
 ) -> lazy_seg_type!(
     T = (T, SP::USize),
-    A = T,
     TFolded = T,
     TGetter = T,
     TSetter = T,
+    A = T,
 )
 where
     T: Clone + Monoid + 'static,
@@ -336,7 +334,7 @@ where
 #[doc = include_str!("../doc_new_add_sum_monoid.md")]
 pub fn lazy_segment_tree_new_add_sum_monoid<T>(
     vec: Vec<T>,
-) -> lazy_seg_type!(T = (T, usize), A = T, TFolded = T, TGetter = T, TSetter = T)
+) -> lazy_seg_type!(T = (T, usize), TFolded = T, TGetter = T, TSetter = T, A = T)
 where
     T: Clone + Monoid + 'static,
 {
