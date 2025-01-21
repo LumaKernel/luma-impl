@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-com-ring = { path = "../../../algebraic-structures.col/com-ring/core.lib" }
+com-ring = { path = "../../../algebraic-structures.col/com-ring.lib" }
 monoid = { path = "../../../algebraic-structures.col/monoid.col/monoid.lib" }
 segment-tree = { path = "../../core.lib" }
 segment-tree-util-type = { path = "../type.lib" }

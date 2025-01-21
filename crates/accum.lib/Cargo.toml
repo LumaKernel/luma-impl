@@ -5,5 +5,5 @@ edition = "2021"
 
 [dependencies]
 access-range = { path = "../access-range.lib" }
-com-ring = { path = "../algebraic-structures.col/com-ring/core.lib" }
+com-ring = { path = "../algebraic-structures.col/com-ring.lib" }
 group = { path = "../algebraic-structures.col/group/core.lib" }

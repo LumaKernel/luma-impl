@@ -1,9 +1,16 @@
 use std::rc::Rc;
 
-#[derive(Clone)]
 pub struct Monoid<T> {
     op: Rc<dyn Fn(&T, &T) -> T>,
     id: Rc<dyn Fn() -> T>,
+}
+impl<T> Clone for Monoid<T> {
+    fn clone(&self) -> Self {
+        Self {
+            op: self.op.clone(),
+            id: self.id.clone(),
+        }
+    }
 }
 
 impl<T> Monoid<T> {

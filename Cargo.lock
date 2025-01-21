@@ -16,16 +16,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "add-monoid"
-version = "0.1.0"
-dependencies = [
- "com-ring",
- "monoid",
- "transparent-derive",
- "transparent-trait",
-]
-
-[[package]]
 name = "byteorder"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -42,6 +32,13 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
+name = "com-monoid"
+version = "0.1.0"
+dependencies = [
+ "monoid",
+]
+
+[[package]]
 name = "com-ring"
 version = "0.1.0"
 dependencies = [
@@ -54,32 +51,6 @@ name = "com-ring-ord"
 version = "0.1.0"
 dependencies = [
  "com-ring",
-]
-
-[[package]]
-name = "com-ring-to-add"
-version = "0.1.0"
-dependencies = [
- "com-ring",
- "group",
-]
-
-[[package]]
-name = "com-ring-to-mul"
-version = "0.1.0"
-dependencies = [
- "com-ring",
- "commutative-monoid",
- "monoid",
- "transparent-derive",
- "transparent-trait",
-]
-
-[[package]]
-name = "commutative-monoid"
-version = "0.1.0"
-dependencies = [
- "monoid",
 ]
 
 [[package]]
@@ -145,7 +116,7 @@ dependencies = [
  "lazy-segment-tree-util-add-sum",
  "lazy-segment-tree-util-new-with-len",
  "lazy-segment-tree-util-new-with-range",
- "lazy-segment-tree-util-set-min-max",
+ "lazy-segment-tree-util-set-min",
  "lazy-segment-tree-util-set-min-max-count",
  "lazy-segment-tree-util-set-sum",
  "lazy-segment-tree-util-type",
@@ -182,8 +153,6 @@ version = "0.1.0"
 dependencies = [
  "com-ring",
  "com-ring-ord",
- "com-ring-to-add",
- "com-ring-to-mul",
  "group-to-monoid",
  "lazy-segment-tree",
  "lazy-segment-tree-util-new-with-len",
@@ -212,13 +181,23 @@ dependencies = [
 ]
 
 [[package]]
-name = "lazy-segment-tree-util-set-min-max"
+name = "lazy-segment-tree-util-set-max"
+version = "0.1.0"
+dependencies = [
+ "lazy-segment-tree",
+ "lazy-segment-tree-util-type",
+ "min-exists",
+ "monoid-action-set-max",
+]
+
+[[package]]
+name = "lazy-segment-tree-util-set-min"
 version = "0.1.0"
 dependencies = [
  "lazy-segment-tree",
  "lazy-segment-tree-util-type",
  "max-exists",
- "min-exists",
+ "monoid-action-set-min",
 ]
 
 [[package]]
@@ -241,8 +220,6 @@ version = "0.1.0"
 dependencies = [
  "com-ring",
  "com-ring-ord",
- "com-ring-to-add",
- "com-ring-to-mul",
  "group-to-monoid",
  "lazy-segment-tree",
  "lazy-segment-tree-util-new-with-len",
@@ -270,10 +247,9 @@ version = "0.1.0"
 name = "max-monoid"
 version = "0.1.0"
 dependencies = [
- "min-exists",
+ "com-monoid",
+ "max-exists",
  "monoid",
- "transparent-derive",
- "transparent-trait",
 ]
 
 [[package]]
@@ -291,10 +267,9 @@ dependencies = [
 name = "min-monoid"
 version = "0.1.0"
 dependencies = [
+ "com-monoid",
  "max-exists",
  "monoid",
- "transparent-derive",
- "transparent-trait",
 ]
 
 [[package]]
@@ -304,6 +279,22 @@ version = "0.1.0"
 [[package]]
 name = "monoid-action"
 version = "0.1.0"
+
+[[package]]
+name = "monoid-action-set-max"
+version = "0.1.0"
+dependencies = [
+ "min-exists",
+ "monoid-action",
+]
+
+[[package]]
+name = "monoid-action-set-min"
+version = "0.1.0"
+dependencies = [
+ "max-exists",
+ "monoid-action",
+]
 
 [[package]]
 name = "paint-rect-calc-area"
@@ -411,6 +402,7 @@ name = "segment-tree-util-min-max"
 version = "0.1.0"
 dependencies = [
  "max-exists",
+ "max-monoid",
  "min-exists",
  "segment-tree",
  "segment-tree-util-type",

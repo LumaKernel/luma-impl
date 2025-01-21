@@ -1,8 +1,0 @@
-[package]
-name = "com-ring-to-add"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-com-ring = { path = "../core.lib" }
-group = { path = "../../group/core.lib" }

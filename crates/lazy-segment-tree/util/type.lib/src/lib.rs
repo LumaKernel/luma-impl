@@ -61,11 +61,6 @@ macro_rules! lazy_seg_type {
             impl Fn($t, usize) -> $t_getter,
             impl Fn($t_setter, usize) -> $t,
             impl Fn($a_setter) -> $a,
-            impl Fn(&$t, &$t) -> $t,
-            impl Fn() -> $t,
-            impl Fn(&$a, &$a) -> $a,
-            impl Fn() -> $a,
-            impl Fn(&$a, &$t) -> $t,
         >
     };
 }

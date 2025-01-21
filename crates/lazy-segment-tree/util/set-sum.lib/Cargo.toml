@@ -4,10 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-com-ring = { path = "../../../algebraic-structures.col/com-ring/core.lib" }
+com-ring = { path = "../../../algebraic-structures.col/com-ring.lib" }
 com-ring-ord = { path = "../../../algebraic-structures.col/com-ring-ord.lib" }
-com-ring-to-add = { path = "../../../algebraic-structures.col/com-ring/to-add.lib" }
-com-ring-to-mul = { path = "../../../algebraic-structures.col/com-ring/to-mul.lib" }
 group-to-monoid = { path = "../../../algebraic-structures.col/group/to-monoid.lib" }
 lazy-segment-tree = { path = "../../core.lib" }
 lazy-segment-tree-util-new-with-len = { path = "../new-with-len.lib" }

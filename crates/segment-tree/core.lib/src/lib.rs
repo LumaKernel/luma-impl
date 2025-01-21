@@ -53,6 +53,11 @@ pub fn segment_tree_new<T>(
     SegmentTree::new(vec, monoid)
 }
 
+#[inline]
+pub fn segment_tree_by_monoid<T>(vec: Vec<T>, monoid: Monoid<T>) -> seg_type!(T = T) {
+    SegmentTree::new(vec, monoid)
+}
+
 impl<T> SegmentTree<T, T, T, T, fn(T) -> T, fn(T, usize) -> T, fn(T, usize) -> T> {
     pub fn new(vec: Vec<T>, monoid: Monoid<T>) -> Self {
         #[inline(always)]
