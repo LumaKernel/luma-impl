@@ -11,8 +11,7 @@ name = "accum"
 version = "0.1.0"
 dependencies = [
  "access-range",
- "commutative-ring",
- "commutative-ring-as-additive-group",
+ "com-ring",
  "group",
 ]
 
@@ -20,7 +19,7 @@ dependencies = [
 name = "add-monoid"
 version = "0.1.0"
 dependencies = [
- "commutative-ring",
+ "com-ring",
  "monoid",
  "transparent-derive",
  "transparent-trait",
@@ -43,10 +42,37 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "baf1de4339761588bc0619e3cbc0120ee582ebb74b53b4efbf79117bd2da40fd"
 
 [[package]]
-name = "commutative-field"
+name = "com-ring"
 version = "0.1.0"
 dependencies = [
- "commutative-ring",
+ "group",
+ "monoid",
+]
+
+[[package]]
+name = "com-ring-ord"
+version = "0.1.0"
+dependencies = [
+ "com-ring",
+]
+
+[[package]]
+name = "com-ring-to-add"
+version = "0.1.0"
+dependencies = [
+ "com-ring",
+ "group",
+]
+
+[[package]]
+name = "com-ring-to-mul"
+version = "0.1.0"
+dependencies = [
+ "com-ring",
+ "commutative-monoid",
+ "monoid",
+ "transparent-derive",
+ "transparent-trait",
 ]
 
 [[package]]
@@ -57,35 +83,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "commutative-ring"
-version = "0.1.0"
-
-[[package]]
-name = "commutative-ring-as-additive-group"
+name = "field"
 version = "0.1.0"
 dependencies = [
- "commutative-ring",
- "group",
- "transparent-derive",
- "transparent-trait",
-]
-
-[[package]]
-name = "commutative-ring-as-multicative-commutative-monoid"
-version = "0.1.0"
-dependencies = [
- "commutative-monoid",
- "commutative-ring",
- "monoid",
- "transparent-derive",
- "transparent-trait",
-]
-
-[[package]]
-name = "commutative-ring-ord"
-version = "0.1.0"
-dependencies = [
- "commutative-ring",
+ "com-ring",
 ]
 
 [[package]]
@@ -104,21 +105,19 @@ name = "group"
 version = "0.1.0"
 
 [[package]]
-name = "group-as-monoid"
+name = "group-to-monoid"
 version = "0.1.0"
 dependencies = [
  "group",
  "monoid",
- "transparent-derive",
- "transparent-trait",
 ]
 
 [[package]]
 name = "int"
 version = "0.1.0"
 dependencies = [
- "commutative-ring",
- "commutative-ring-ord",
+ "com-ring",
+ "com-ring-ord",
  "max-exists",
  "min-exists",
 ]
@@ -156,7 +155,7 @@ dependencies = [
 name = "lazy-segment-tree-util-add-min-max"
 version = "0.1.0"
 dependencies = [
- "commutative-ring-ord",
+ "com-ring-ord",
  "lazy-segment-tree",
  "lazy-segment-tree-util-type",
  "max-exists",
@@ -167,8 +166,8 @@ dependencies = [
 name = "lazy-segment-tree-util-add-min-max-count"
 version = "0.1.0"
 dependencies = [
- "commutative-ring",
- "commutative-ring-ord",
+ "com-ring",
+ "com-ring-ord",
  "lazy-segment-tree",
  "lazy-segment-tree-util-type",
  "max-exists",
@@ -181,11 +180,11 @@ dependencies = [
 name = "lazy-segment-tree-util-add-sum"
 version = "0.1.0"
 dependencies = [
- "commutative-ring",
- "commutative-ring-as-additive-group",
- "commutative-ring-as-multicative-commutative-monoid",
- "commutative-ring-ord",
- "group-as-monoid",
+ "com-ring",
+ "com-ring-ord",
+ "com-ring-to-add",
+ "com-ring-to-mul",
+ "group-to-monoid",
  "lazy-segment-tree",
  "lazy-segment-tree-util-new-with-len",
  "lazy-segment-tree-util-type",
@@ -198,7 +197,7 @@ dependencies = [
 name = "lazy-segment-tree-util-new-with-len"
 version = "0.1.0"
 dependencies = [
- "commutative-ring",
+ "com-ring",
  "lazy-segment-tree",
  "lazy-segment-tree-util-type",
  "shrink-provider",
@@ -226,7 +225,7 @@ dependencies = [
 name = "lazy-segment-tree-util-set-min-max-count"
 version = "0.1.0"
 dependencies = [
- "commutative-ring",
+ "com-ring",
  "lazy-segment-tree",
  "lazy-segment-tree-util-new-with-len",
  "lazy-segment-tree-util-type",
@@ -240,11 +239,11 @@ dependencies = [
 name = "lazy-segment-tree-util-set-sum"
 version = "0.1.0"
 dependencies = [
- "commutative-ring",
- "commutative-ring-as-additive-group",
- "commutative-ring-as-multicative-commutative-monoid",
- "commutative-ring-ord",
- "group-as-monoid",
+ "com-ring",
+ "com-ring-ord",
+ "com-ring-to-add",
+ "com-ring-to-mul",
+ "group-to-monoid",
  "lazy-segment-tree",
  "lazy-segment-tree-util-new-with-len",
  "lazy-segment-tree-util-type",
@@ -310,7 +309,7 @@ version = "0.1.0"
 name = "paint-rect-calc-area"
 version = "0.1.0"
 dependencies = [
- "commutative-ring",
+ "com-ring",
  "int",
  "lazy-segment-tree-util-add-min-max-count",
  "polyfill-vec-chunk-by",
@@ -421,7 +420,7 @@ dependencies = [
 name = "segment-tree-util-sum"
 version = "0.1.0"
 dependencies = [
- "commutative-ring",
+ "com-ring",
  "monoid",
  "segment-tree",
  "segment-tree-util-type",

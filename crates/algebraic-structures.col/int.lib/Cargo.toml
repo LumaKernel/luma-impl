@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-commutative-ring = { path = "../commutative-ring/core.lib" }
-commutative-ring-ord = { path = "../commutative-ring-ord.lib" }
+com-ring = { path = "../com-ring/core.lib" }
+com-ring-ord = { path = "../com-ring-ord.lib" }
 max-exists = { path = "../ord.col/max-exists.lib" }
 min-exists = { path = "../ord.col/min-exists.lib" }
