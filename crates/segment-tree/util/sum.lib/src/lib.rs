@@ -1,4 +1,5 @@
-use commutative_ring::CommutativeRing;
+use com_ring::ComRing;
+use com_ring::DefaultComRing;
 use monoid::Monoid;
 use segment_tree::{segment_tree_new, SegmentTree};
 use segment_tree_util_type::seg_type;
@@ -23,15 +24,15 @@ impl<T> SegmentTreeSumBuilder<T> {
         self.t_add = Some(Box::new(t_add));
         self
     }
-    pub fn set_add_zero_by_commutative_ring_add(self) -> Self
+    pub fn set_add_zero_by_com_ring_add(self) -> Self
     where
-        T: CommutativeRing,
+        T: comRing,
     {
         self.set_add(|a, b| a.add(b)).set_zero(|| T::zero())
     }
-    pub fn set_add_zero_by_commutative_ring_mul(self) -> Self
+    pub fn set_add_zero_by_com_ring_mul(self) -> Self
     where
-        T: CommutativeRing,
+        T: comRing,
     {
         self.set_add(|a, b| a.mul(b)).set_zero(|| T::one())
     }
@@ -85,8 +86,8 @@ pub fn segment_tree_builder_sum<T>(vec: Vec<T>) -> SegmentTreeSumBuilder<T> {
 #[doc = include_str!("../doc_new_sum.md")]
 pub fn segment_tree_new_sum<T>(vec: Vec<T>) -> seg_type!(T = T)
 where
-    T: CommutativeRing,
+    T: DefaultComRing,
 {
-    let builder = segment_tree_builder_sum(vec).set_add_zero_by_commutative_ring_add();
+    let builder = segment_tree_builder_sum(vec).set_add_zero_by_com_ring_add();
     unsafe { builder.build_unchecked() }
 }

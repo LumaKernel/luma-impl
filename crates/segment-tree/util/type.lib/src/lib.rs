@@ -42,8 +42,6 @@ macro_rules! seg_type {
             impl Fn($t) -> $t_folded,
             impl Fn($t, usize) -> $t_getter,
             impl Fn($t_setter, usize) -> $t,
-            impl Fn(&$t, &$t) -> $t,
-            impl Fn() -> $t,
         >
     };
 }

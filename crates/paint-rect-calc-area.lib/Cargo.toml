@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-commutative-ring = { path = "../algebraic-structures.col/commutative-ring/core.lib" }
+com-ring = { path = "../algebraic-structures.col/com-ring.lib" }
 int = { path = "../algebraic-structures.col/int.lib" }
 lazy-segment-tree-util-add-min-max-count = { path = "../lazy-segment-tree/util/add-min-max-count.lib" }
 polyfill-vec-chunk-by = { path = "../polyfill/vec/chunk-by.lib" }

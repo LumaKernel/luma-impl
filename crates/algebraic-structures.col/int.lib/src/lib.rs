@@ -1,10 +1,44 @@
-use commutative_ring::CommutativeRing;
-use commutative_ring_ord::CommutativeRingOrd;
 use max_exists::MaxExists;
 use min_exists::MinExists;
 use std::cmp;
 use std::fmt::{Debug, Display};
 use std::ops;
+
+/// ビルトインの整数型の0
+pub trait Int0 {
+    fn int0() -> Self;
+}
+/// ビルトインの整数型の1
+pub trait Int1 {
+    fn int1() -> Self;
+}
+/// ビルトインの整数型の2
+pub trait Int2 {
+    fn int2() -> Self;
+}
+
+macro_rules! impl_int_n {
+    ($($t:ty),+ $(,)?) => {
+        $(
+            impl Int0 for $t {
+                fn int0() -> Self {
+                    0
+                }
+            }
+            impl Int1 for $t {
+                fn int1() -> Self {
+                    1
+                }
+            }
+            impl Int2 for $t {
+                fn int2() -> Self {
+                    2
+                }
+            }
+        )+
+    };
+}
+impl_int_n!(i8, i16, i32, i64, i128, isize, u8, u16, u32, u64, u128, usize);
 
 macro_rules! int_trait {
     ($t:ident $(: $extra_bound0:path $(, $extra_bounds:path)*)? { $($body:tt)* }) => {
@@ -16,7 +50,9 @@ macro_rules! int_trait {
             + Debug
             + cmp::Ord
             + Eq
-            + CommutativeRing
+            + Int0
+            + Int1
+            + Int2
             + ops::Add<Output = Self>
             + ops::Sub<Output = Self>
             + ops::Mul<Output = Self>
@@ -47,7 +83,7 @@ macro_rules! int_trait {
     }
 }
 
-int_trait!(SignedInt: ops::Neg, CommutativeRingOrd {
+int_trait!(SignedInt: ops::Neg, DefaultComRingOrd {
     type UnsignedIntSameSize: UnsignedInt;
     fn to_same_size_unsigned_int(self) -> Self::UnsignedIntSameSize;
 });

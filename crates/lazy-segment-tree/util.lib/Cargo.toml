@@ -10,7 +10,7 @@ lazy-segment-tree-util-add-min-max-count = { path = "../util/add-min-max-count.l
 lazy-segment-tree-util-add-sum = { path = "../util/add-sum.lib" }
 lazy-segment-tree-util-new-with-len = { path = "../util/new-with-len.lib" }
 lazy-segment-tree-util-new-with-range = { path = "../util/new-with-range.lib" }
-lazy-segment-tree-util-set-min-max = { path = "../util/set-min-max.lib" }
+lazy-segment-tree-util-set-min = { path = "../util/set-min.lib" }
 lazy-segment-tree-util-set-min-max-count = { path = "../util/set-min-max-count.lib" }
 lazy-segment-tree-util-set-sum = { path = "../util/set-sum.lib" }
 lazy-segment-tree-util-type = { path = "../util/type.lib" }
