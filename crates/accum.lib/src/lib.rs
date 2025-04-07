@@ -33,7 +33,7 @@ where
             if range.start >= range.end {
                 self.group.id()
             } else if range.start == 0 {
-                self.group.slow_clone(&self.accum[range.end - 1])
+                self.group.clone_value(&self.accum[range.end - 1])
             } else {
                 self.group.op(
                     &self.group.inv(&self.accum[range.start - 1]),

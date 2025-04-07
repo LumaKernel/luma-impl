@@ -66,10 +66,10 @@ impl<T, A> MonoidAction<T, A> {
         (self.act_app)(t, a)
     }
 
-    pub fn slow_clone_value(&self, a: &T) -> T {
+    pub fn clone_value(&self, a: &T) -> T {
         (self.op)(a, &self.id())
     }
-    pub fn slow_clone_action(&self, t: &A) -> A {
+    pub fn clone_action(&self, t: &A) -> A {
         (self.act_op)(t, &self.act_id())
     }
 

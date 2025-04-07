@@ -1,3 +1,4 @@
+use com_ring_ord::DefaultComRingOrd;
 use max_exists::MaxExists;
 use min_exists::MinExists;
 use std::cmp;

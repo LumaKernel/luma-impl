@@ -30,7 +30,7 @@ impl<T> Monoid<T> {
         (self.id)()
     }
 
-    pub fn slow_clone(&self, a: &T) -> T {
+    pub fn clone_value(&self, a: &T) -> T {
         (self.op)(a, &self.id())
     }
 }

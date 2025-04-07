@@ -64,7 +64,7 @@ impl<T> ComRing<T> {
         (self.one)()
     }
 
-    pub fn slow_clone(&self, a: &T) -> T {
+    pub fn clone_value(&self, a: &T) -> T {
         (self.add)(a, &self.zero())
     }
 

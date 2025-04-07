@@ -5,5 +5,5 @@ edition = "2021"
 
 [dependencies]
 com-monoid = { path = "../../com-monoid.lib" }
-max-exists = { path = "../../../ord.col/max-exists.lib" }
+min-exists = { path = "../../../ord.col/min-exists.lib" }
 monoid = { path = "../../monoid.lib" }

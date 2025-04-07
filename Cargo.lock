@@ -99,7 +99,6 @@ version = "0.1.0"
 dependencies = [
  "access-range",
  "ceil-log2",
- "lazy-segment-tree-util-new-with-len",
  "lazy-segment-tree-util-type",
  "monoid-action",
  "rand",
@@ -111,15 +110,30 @@ name = "lazy-segment-tree-util"
 version = "0.1.0"
 dependencies = [
  "lazy-segment-tree",
+ "lazy-segment-tree-util-add-min-count",
  "lazy-segment-tree-util-add-min-max",
- "lazy-segment-tree-util-add-min-max-count",
  "lazy-segment-tree-util-add-sum",
- "lazy-segment-tree-util-new-with-len",
  "lazy-segment-tree-util-new-with-range",
  "lazy-segment-tree-util-set-min",
  "lazy-segment-tree-util-set-min-max-count",
  "lazy-segment-tree-util-set-sum",
  "lazy-segment-tree-util-type",
+]
+
+[[package]]
+name = "lazy-segment-tree-util-add-min-count"
+version = "0.1.0"
+dependencies = [
+ "com-ring",
+ "com-ring-ord",
+ "lazy-segment-tree",
+ "lazy-segment-tree-util-new-with-size",
+ "lazy-segment-tree-util-type",
+ "max-exists",
+ "min-max-count",
+ "monoid-action",
+ "shrink-provider",
+ "with-size",
 ]
 
 [[package]]
@@ -134,20 +148,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "lazy-segment-tree-util-add-min-max-count"
-version = "0.1.0"
-dependencies = [
- "com-ring",
- "com-ring-ord",
- "lazy-segment-tree",
- "lazy-segment-tree-util-type",
- "max-exists",
- "min-exists",
- "min-max-count",
- "shrink-provider",
-]
-
-[[package]]
 name = "lazy-segment-tree-util-add-sum"
 version = "0.1.0"
 dependencies = [
@@ -155,21 +155,13 @@ dependencies = [
  "com-ring-ord",
  "group-to-monoid",
  "lazy-segment-tree",
- "lazy-segment-tree-util-new-with-len",
+ "lazy-segment-tree-util-new-with-size",
  "lazy-segment-tree-util-type",
  "monoid",
+ "monoid-action-add-sum",
  "shrink-provider",
  "transparent-trait",
-]
-
-[[package]]
-name = "lazy-segment-tree-util-new-with-len"
-version = "0.1.0"
-dependencies = [
- "com-ring",
- "lazy-segment-tree",
- "lazy-segment-tree-util-type",
- "shrink-provider",
+ "with-size",
 ]
 
 [[package]]
@@ -178,6 +170,17 @@ version = "0.1.0"
 dependencies = [
  "lazy-segment-tree",
  "lazy-segment-tree-util-type",
+]
+
+[[package]]
+name = "lazy-segment-tree-util-new-with-size"
+version = "0.1.0"
+dependencies = [
+ "lazy-segment-tree",
+ "lazy-segment-tree-util-type",
+ "monoid-action",
+ "shrink-provider",
+ "with-size",
 ]
 
 [[package]]
@@ -206,7 +209,6 @@ version = "0.1.0"
 dependencies = [
  "com-ring",
  "lazy-segment-tree",
- "lazy-segment-tree-util-new-with-len",
  "lazy-segment-tree-util-type",
  "max-exists",
  "min-exists",
@@ -222,7 +224,6 @@ dependencies = [
  "com-ring-ord",
  "group-to-monoid",
  "lazy-segment-tree",
- "lazy-segment-tree-util-new-with-len",
  "lazy-segment-tree-util-type",
  "monoid",
  "shrink-provider",
@@ -248,7 +249,7 @@ name = "max-monoid"
 version = "0.1.0"
 dependencies = [
  "com-monoid",
- "max-exists",
+ "min-exists",
  "monoid",
 ]
 
@@ -281,6 +282,16 @@ name = "monoid-action"
 version = "0.1.0"
 
 [[package]]
+name = "monoid-action-add-sum"
+version = "0.1.0"
+dependencies = [
+ "com-ring",
+ "monoid-action",
+ "shrink-provider",
+ "with-size",
+]
+
+[[package]]
 name = "monoid-action-set-max"
 version = "0.1.0"
 dependencies = [
@@ -302,7 +313,7 @@ version = "0.1.0"
 dependencies = [
  "com-ring",
  "int",
- "lazy-segment-tree-util-add-min-max-count",
+ "lazy-segment-tree-util-add-min-count",
  "polyfill-vec-chunk-by",
  "rand",
  "rand_xoshiro",

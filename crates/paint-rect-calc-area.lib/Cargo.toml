@@ -6,7 +6,7 @@ edition = "2021"
 [dependencies]
 com-ring = { path = "../algebraic-structures.col/com-ring.lib" }
 int = { path = "../algebraic-structures.col/int.lib" }
-lazy-segment-tree-util-add-min-max-count = { path = "../lazy-segment-tree/util/add-min-max-count.lib" }
+lazy-segment-tree-util-add-min-count = { path = "../lazy-segment-tree/util/add-min-count.lib" }
 polyfill-vec-chunk-by = { path = "../polyfill/vec/chunk-by.lib" }
 shrink = { path = "../shrink/core.lib" }
 

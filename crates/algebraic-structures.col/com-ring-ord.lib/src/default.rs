@@ -1,5 +1,5 @@
+use crate::ComRingOrd;
 use com_ring::DefaultComRing;
-use com_ring_ord::ComRingOrd;
 
 pub trait DefaultComRingOrd: DefaultComRing + Ord + Sized + 'static {
     fn default_com_ring_ord() -> ComRingOrd<Self> {

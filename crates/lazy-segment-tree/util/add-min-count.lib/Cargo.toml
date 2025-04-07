@@ -1,5 +1,5 @@
 [package]
-name = "lazy-segment-tree-util-add-min-max-count"
+name = "lazy-segment-tree-util-add-min-count"
 version = "0.1.0"
 edition = "2021"
 
@@ -7,8 +7,10 @@ edition = "2021"
 com-ring = { path = "../../../algebraic-structures.col/com-ring.lib" }
 com-ring-ord = { path = "../../../algebraic-structures.col/com-ring-ord.lib" }
 lazy-segment-tree = { path = "../../core.lib" }
+lazy-segment-tree-util-new-with-size = { path = "../new-with-size.lib" }
 lazy-segment-tree-util-type = { path = "../type.lib" }
 max-exists = { path = "../../../algebraic-structures.col/ord.col/max-exists.lib" }
-min-exists = { path = "../../../algebraic-structures.col/ord.col/min-exists.lib" }
 min-max-count = { path = "../../../min-max-count.lib" }
+monoid-action = { path = "../../../algebraic-structures.col/monoid.col/monoid-action.lib" }
 shrink-provider = { path = "../../../shrink/provider.lib" }
+with-size = { path = "../../../with-size.lib" }

@@ -8,8 +8,10 @@ com-ring = { path = "../../../algebraic-structures.col/com-ring.lib" }
 com-ring-ord = { path = "../../../algebraic-structures.col/com-ring-ord.lib" }
 group-to-monoid = { path = "../../../algebraic-structures.col/group/to-monoid.lib" }
 lazy-segment-tree = { path = "../../core.lib" }
-lazy-segment-tree-util-new-with-len = { path = "../new-with-len.lib" }
+lazy-segment-tree-util-new-with-size = { path = "../new-with-size.lib" }
 lazy-segment-tree-util-type = { path = "../type.lib" }
 monoid = { path = "../../../algebraic-structures.col/monoid.col/monoid.lib" }
+monoid-action-add-sum = { path = "../../../algebraic-structures.col/monoid.col/well-known.col/monoid-action/add-sum.lib" }
 shrink-provider = { path = "../../../shrink/provider.lib" }
 transparent-trait = { path = "../../../transparent/trait.lib" }
+with-size = { path = "../../../with-size.lib" }
