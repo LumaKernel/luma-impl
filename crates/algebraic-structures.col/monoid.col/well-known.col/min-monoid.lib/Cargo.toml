@@ -1,0 +1,9 @@
+[package]
+name = "min-monoid"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+com-monoid = { path = "../../com-monoid.lib" }
+max-exists = { path = "../../../ord.col/max-exists.lib" }
+monoid = { path = "../../monoid.lib" }

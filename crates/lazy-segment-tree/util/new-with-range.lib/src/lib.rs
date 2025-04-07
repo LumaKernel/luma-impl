@@ -1,27 +1,20 @@
 use lazy_segment_tree::{lazy_segment_tree_new, LazySegmentTree};
 use lazy_segment_tree_util_type::lazy_seg_type;
 
-pub fn lazy_segment_tree_new_with_range<T, A, Op, Id, ActOp, ActId, ActAppWithRange>(
+pub fn lazy_segment_tree_new_with_range<T, A>(
     vec: Vec<T>,
-    op: Op,
-    id: Id,
-    act_op: ActOp,
-    act_id: ActId,
-    act_app_with_range: ActAppWithRange,
+    op: impl Fn(&T, &T) -> T + 'static,
+    id: impl Fn() -> T + 'static,
+    act_op: impl Fn(&A, &A) -> A + 'static,
+    act_id: impl Fn() -> A + 'static,
+    act_app_with_range: impl Fn(&A, &T, usize, usize) -> T + 'static,
 ) -> lazy_seg_type!(
     T = (T, usize, usize),
     TFolded = T,
     TGetter = T,
     TSetter = T,
     A = A,
-)
-where
-    Op: Fn(&T, &T) -> T,
-    Id: Fn() -> T,
-    ActOp: Fn(&A, &A) -> A,
-    ActId: Fn() -> A,
-    ActAppWithRange: Fn(&A, &T, usize, usize) -> T,
-{
+) {
     lazy_segment_tree_new(
         vec.into_iter()
             .enumerate()

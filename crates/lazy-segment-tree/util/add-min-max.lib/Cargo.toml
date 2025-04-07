@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-commutative-ring-ord = { path = "../../../algebraic-structures.col/commutative-ring-ord.lib" }
+com-ring-ord = { path = "../../../algebraic-structures.col/com-ring-ord.lib" }
 lazy-segment-tree = { path = "../../core.lib" }
 lazy-segment-tree-util-type = { path = "../type.lib" }
 max-exists = { path = "../../../algebraic-structures.col/ord.col/max-exists.lib" }

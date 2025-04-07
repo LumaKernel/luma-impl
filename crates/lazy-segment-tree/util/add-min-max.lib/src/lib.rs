@@ -1,4 +1,4 @@
-use commutative_ring_ord::CommutativeRingOrd;
+use com_ring_ord::DefaultComRingOrd;
 use lazy_segment_tree::{lazy_segment_tree_new, LazySegmentTree};
 use lazy_segment_tree_util_type::lazy_seg_type;
 use max_exists::MaxExists;

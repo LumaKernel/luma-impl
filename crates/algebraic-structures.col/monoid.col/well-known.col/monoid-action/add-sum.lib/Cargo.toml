@@ -1,0 +1,10 @@
+[package]
+name = "monoid-action-add-sum"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+com-ring = { path = "../../../../com-ring.lib" }
+monoid-action = { path = "../../../monoid-action.lib" }
+shrink-provider = { path = "../../../../../shrink/provider.lib" }
+with-size = { path = "../../../../../with-size.lib" }

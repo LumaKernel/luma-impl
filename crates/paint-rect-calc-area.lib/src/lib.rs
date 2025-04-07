@@ -1,4 +1,3 @@
-use commutative_ring::CommutativeRing;
 use int::{Int, UnsignedInt};
 use lazy_segment_tree_util_add_min_max_count::lazy_segment_tree_builder_add_min_count_shrinkable;
 #[allow(unused_imports)]
@@ -25,7 +24,7 @@ where
     TU: UnsignedInt,
 {
     if v.is_empty() {
-        return TU::zero();
+        return TU::int0();
     }
     let xs = v
         .iter()
@@ -41,15 +40,15 @@ where
         .filter(|r| r.y1 != r.y2)
         .flat_map(|r| {
             [
-                (TU::one(), r.y1, r.x1, r.x2),
-                (TU::neg(&TU::one()), r.y2, r.x1, r.x2),
+                (TU::int1(), r.y1, r.x1, r.x2),
+                (TU::neg(&TU::int1()), r.y2, r.x1, r.x2),
             ]
         })
         .collect::<Vec<_>>();
     events.sort_unstable_by_key(|(_, y, _, _)| *y);
-    let mut ans = TU::zero();
+    let mut ans = TU::int0();
     let seg = lazy_segment_tree_builder_add_min_count_shrinkable(
-        vec![TU::zero(); xs.shrinked_len() - 1],
+        vec![TU::int0(); xs.shrinked_len() - 1],
         xs.clone(),
     )
     .set_add(|a, b| <TU as CommutativeRing>::add(a, b))
@@ -62,7 +61,7 @@ where
         let y = unsafe { chunk.get_unchecked(0) }.1;
         if let Some(last_y) = last_y {
             let min_count = seg.fold(..);
-            ans += if min_count.min == TU::zero() {
+            ans += if min_count.min == TU::int0() {
                 entire_len - min_count.count
             } else {
                 entire_len
@@ -129,7 +128,8 @@ impl<T: Int> PaintRectCalcAreaBuilder<T> {
     /// - `x2 < T::MAX`
     /// - `y2 < T::MAX`
     pub fn add_inclusive(mut self, x1: T, y1: T, x2: T, y2: T) -> Self {
-        self.v.push(Rect::new(x1, y1, x2 + T::one(), y2 + T::one()));
+        self.v
+            .push(Rect::new(x1, y1, x2 + T::int1(), y2 + T::int1()));
         self
     }
     pub fn calc_area<TU>(self) -> <T as Int>::UnsignedIntSameSize

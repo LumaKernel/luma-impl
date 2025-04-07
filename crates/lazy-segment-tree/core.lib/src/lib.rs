@@ -1,7 +1,7 @@
 use access_range::IntoAccessRange;
 use ceil_log2::ceil_log2_usize;
 use lazy_segment_tree_util_type::lazy_seg_type;
-use monoid_action::QuickMonoidAction;
+use monoid_action::MonoidAction;
 use std::mem;
 
 pub struct LazySegmentTree<
@@ -15,24 +15,13 @@ pub struct LazySegmentTree<
     TIntoGetter,
     TFromSetter,
     AFromSetter,
-    Op,
-    Id,
-    ActOp,
-    ActId,
-    ActApp,
 > where
-    Op: Fn(&T, &T) -> T,
-    Id: Fn() -> T,
-    ActOp: Fn(&A, &A) -> A,
-    ActId: Fn() -> A,
-    ActApp: Fn(&A, &T) -> T,
-
     TIntoFolded: Fn(T) -> TFolded,
     TIntoGetter: Fn(T, /* index */ usize) -> TGetter,
     TFromSetter: Fn(TSetter, /* index */ usize) -> T,
     AFromSetter: Fn(ASetter) -> A,
 {
-    monoid_action: QuickMonoidAction<T, A, Op, Id, ActOp, ActId, ActApp>,
+    monoid_action: MonoidAction<T, A>,
     tree: Vec<T>,
     lazy: Vec<A>,
     size: usize,
@@ -43,6 +32,89 @@ pub struct LazySegmentTree<
     t_from_setter: TFromSetter,
     a_from_setter: AFromSetter,
     phantom: std::marker::PhantomData<(TSetter, ASetter)>,
+}
+
+impl<T, A>
+    LazySegmentTree<T, T, T, T, A, A, fn(T) -> T, fn(T, usize) -> T, fn(T, usize) -> T, fn(A) -> A>
+{
+    #[inline(always)]
+    pub fn new(
+        vec: Vec<T>,
+        monoid_action: MonoidAction<T, A>,
+    ) -> LazySegmentTree<
+        T,
+        T,
+        T,
+        T,
+        A,
+        A,
+        impl Fn(T) -> T,
+        impl Fn(T, usize) -> T,
+        impl Fn(T, usize) -> T,
+        impl Fn(A) -> A,
+    > {
+        let mut tree = Vec::new();
+        let len = vec.len();
+        fn id_fn<T>(x: T) -> T {
+            x
+        }
+        fn id_fn_idx<T>(x: T, _: usize) -> T {
+            x
+        }
+        if len == 0 {
+            return LazySegmentTree {
+                monoid_action,
+                tree,
+                lazy: Default::default(),
+                size: len,
+                size_pow2: 0,
+
+                t_into_folded: id_fn,
+                t_into_getter: id_fn_idx,
+                t_from_setter: id_fn_idx,
+                a_from_setter: id_fn,
+                phantom: Default::default(),
+            };
+        }
+
+        let height = ceil_log2_usize(len);
+        let len2 = 1 << height;
+
+        tree.reserve_exact(len2 * 2);
+        // Padding identities for the rest spaces.
+        for _ in 0..(len2 - len) {
+            tree.push(monoid_action.id());
+        }
+        for e in vec.into_iter().rev() {
+            tree.push(e);
+        }
+        for i in 0..len2 - 1 {
+            let right = unsafe { tree.get_unchecked(i * 2) };
+            let left = unsafe { tree.get_unchecked(i * 2 + 1) };
+            tree.push(monoid_action.op(left, right));
+        }
+        tree.push(monoid_action.id());
+        tree.reverse();
+        debug_assert_eq!(tree.len(), len2 * 2);
+        let mut lazy = Vec::new();
+        lazy.reserve_exact(len2 * 2);
+        for _ in 0..len2 * 2 {
+            lazy.push(monoid_action.act_id());
+        }
+        LazySegmentTree {
+            monoid_action,
+            tree,
+            lazy,
+            size: len,
+            size_pow2: len2,
+
+            t_into_folded: id_fn,
+            t_into_getter: id_fn_idx,
+            t_from_setter: id_fn_idx,
+            a_from_setter: id_fn,
+            phantom: Default::default(),
+        }
+    }
 }
 
 impl<
@@ -56,11 +128,6 @@ impl<
         TIntoGetter,
         TFromSetter,
         AFromSetter,
-        Op,
-        Id,
-        ActOp,
-        ActId,
-        ActApp,
     >
     LazySegmentTree<
         T,
@@ -73,19 +140,8 @@ impl<
         TIntoGetter,
         TFromSetter,
         AFromSetter,
-        Op,
-        Id,
-        ActOp,
-        ActId,
-        ActApp,
     >
 where
-    Op: Fn(&T, &T) -> T,
-    Id: Fn() -> T,
-    ActOp: Fn(&A, &A) -> A,
-    ActId: Fn() -> A,
-    ActApp: Fn(&A, &T) -> T,
-
     TIntoFolded: Fn(T) -> TFolded,
     TIntoGetter: Fn(T, /* index */ usize) -> TGetter,
     TFromSetter: Fn(TSetter, /* index */ usize) -> T,
@@ -108,7 +164,7 @@ where
         self.size
     }
 
-    pub fn monoid_action(&self) -> &QuickMonoidAction<T, A, Op, Id, ActOp, ActId, ActApp> {
+    pub fn monoid_action(&self) -> &MonoidAction<T, A> {
         &self.monoid_action
     }
 
@@ -533,84 +589,24 @@ where
 /// assert_eq!(seg.fold(..), 4);
 /// ```
 #[inline]
-pub fn lazy_segment_tree_new<T, A, Op, Id, ActOp, ActId, ActApp>(
+pub fn lazy_segment_tree_new<T, A>(
     vec: Vec<T>,
-    op: Op,
-    id: Id,
-    act_op: ActOp,
-    act_id: ActId,
-    act_app: ActApp,
-) -> lazy_seg_type!(T = T, A = A)
-where
-    Op: Fn(&T, &T) -> T,
-    Id: Fn() -> T,
-    ActOp: Fn(&A, &A) -> A,
-    ActId: Fn() -> A,
-    ActApp: Fn(&A, &T) -> T,
-{
-    let monoid_action = QuickMonoidAction::new(op, id, act_op, act_id, act_app);
+    op: impl Fn(&T, &T) -> T + 'static,
+    id: impl Fn() -> T + 'static,
+    act_op: impl Fn(&A, &A) -> A + 'static,
+    act_id: impl Fn() -> A + 'static,
+    act_app: impl Fn(&A, &T) -> T + 'static,
+) -> lazy_seg_type!(T = T, A = A) {
+    let monoid_action = MonoidAction::new(op, id, act_op, act_id, act_app);
+    LazySegmentTree::new(vec, monoid_action)
+}
 
-    let mut tree = Vec::new();
-    let len = vec.len();
-    fn id_fn<T>(x: T) -> T {
-        x
-    }
-    fn id_fn_idx<T>(x: T, _: usize) -> T {
-        x
-    }
-    if len == 0 {
-        return LazySegmentTree {
-            monoid_action,
-            tree,
-            lazy: Default::default(),
-            size: len,
-            size_pow2: 0,
-
-            t_into_folded: id_fn,
-            t_into_getter: id_fn_idx,
-            t_from_setter: id_fn_idx,
-            a_from_setter: id_fn,
-            phantom: Default::default(),
-        };
-    }
-
-    let height = ceil_log2_usize(len);
-    let len2 = 1 << height;
-
-    tree.reserve_exact(len2 * 2);
-    // Padding identities for the rest spaces.
-    for _ in 0..(len2 - len) {
-        tree.push(monoid_action.id());
-    }
-    for e in vec.into_iter().rev() {
-        tree.push(e);
-    }
-    for i in 0..len2 - 1 {
-        let right = unsafe { tree.get_unchecked(i * 2) };
-        let left = unsafe { tree.get_unchecked(i * 2 + 1) };
-        tree.push(monoid_action.op(left, right));
-    }
-    tree.push(monoid_action.id());
-    tree.reverse();
-    debug_assert_eq!(tree.len(), len2 * 2);
-    let mut lazy = Vec::new();
-    lazy.reserve_exact(len2 * 2);
-    for _ in 0..len2 * 2 {
-        lazy.push(monoid_action.act_id());
-    }
-    LazySegmentTree {
-        monoid_action,
-        tree,
-        lazy,
-        size: len,
-        size_pow2: len2,
-
-        t_into_folded: id_fn,
-        t_into_getter: id_fn_idx,
-        t_from_setter: id_fn_idx,
-        a_from_setter: id_fn,
-        phantom: Default::default(),
-    }
+#[inline]
+pub fn lazy_segment_tree_by_monoid_action<T, A>(
+    vec: Vec<T>,
+    monoid_action: MonoidAction<T, A>,
+) -> lazy_seg_type!(T = T, A = A) {
+    LazySegmentTree::new(vec, monoid_action)
 }
 
 #[cfg(test)]

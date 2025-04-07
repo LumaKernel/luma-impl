@@ -1,0 +1,8 @@
+[package]
+name = "monoid-action-set-max"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+min-exists = { path = "../../../../ord.col/min-exists.lib" }
+monoid-action = { path = "../../../monoid-action.lib" }

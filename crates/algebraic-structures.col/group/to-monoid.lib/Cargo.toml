@@ -1,0 +1,8 @@
+[package]
+name = "group-to-monoid"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+group = { path = "../core.lib" }
+monoid = { path = "../../monoid.col/monoid.lib" }
